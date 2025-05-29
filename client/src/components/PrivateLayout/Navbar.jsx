@@ -10,11 +10,16 @@ import {
   MenuItem,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { clearUser } from "../../redux/slice/userSlice";
+import { signOut } from "firebase/auth";
+import { auth } from "../../utils/firebase";
+import toast from "react-hot-toast";
 export const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
 
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -22,7 +27,17 @@ export const Navbar = () => {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-
+  const handleLogout = async () => {
+    try {
+      await signOut(auth); // Firebase logout
+      localStorage.removeItem("accessToken");
+      dispatch(clearUser());
+      toast("Logout Successfully");
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
   const handleProfileClick = () => {
     handleMenuClose();
     navigate("/profile");
@@ -53,6 +68,7 @@ export const Navbar = () => {
           >
             <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
             <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </Box>
       </Toolbar>

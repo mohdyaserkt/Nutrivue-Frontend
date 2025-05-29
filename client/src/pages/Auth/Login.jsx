@@ -6,13 +6,14 @@ import {
   Button,
   Typography,
   Paper,
+  Tabs,
+  Tab,
+  Divider,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import {
+  fetchSignInMethodsForEmail,
   signInWithEmailAndPassword,
-  getIdToken,
-  GoogleAuthProvider,
-  signInWithPopup,
 } from "firebase/auth";
 import { auth } from "../../utils/firebase";
 import toast from "react-hot-toast";
@@ -20,81 +21,73 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { addUser } from "../../redux/slice/userSlice";
 import GoogleIcon from "@mui/icons-material/Google";
+import { PasswordlessEmailForm } from "../../components/PrivateLayout/PasswordlessEmailForm";
+import { useGoogleAuth } from "../../hooks/useGoogleAuth";
 export const Login = () => {
+  const [tabIndex, setTabIndex] = useState(0);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { signInWithGoogle } = useGoogleAuth();
+
+  const handleChange = (event, newValue) => {
+    setTabIndex(newValue);
+    setEmail("");
+    setPassword("");
+  };
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      const methods = await fetchSignInMethodsForEmail(auth, email);
+      console.log("methods==", methods);
+   if (methods.includes("google.com") && !methods.includes("password")) {
+          toast.error(
+            "This email is registered via Google. Please use Google Login."
+          );
+          return;
+        }
+
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
         password
       );
+
       const firebaseUser = userCredential.user;
       const idToken = await firebaseUser.getIdToken();
-      await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/firebase`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+   
+      console.log("idToken==",idToken)
+      // await axios.post(
+      //   `${import.meta.env.VITE_API_BASE_URL}/auth/firebase`,
+      //   {},
+      //   {
+      //     headers: {
+      //       Authorization: `Bearer ${idToken}`,
+      //       "Content-Type": "application/json",
+      //     },
+      //   }
+      // );
       localStorage.setItem("accessToken", idToken);
       const userData = {
         uid: firebaseUser.uid,
         email: firebaseUser.email,
-        name: firebaseUser.displayName || "", // Firebase doesn't set name by default for email/password
       };
-
       dispatch(addUser(userData));
+      navigate("/dashboard");
       toast("Login successful!");
     } catch (err) {
-      toast(err.message);
-    }
-    console.log("Email:", email);
-    console.log("Password:", password);
-  };
-  const handleGoogleLogin = async () => {
-    const provider = new GoogleAuthProvider();
-
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-
-      // Optional: Get ID token if sending to backend
-      const idToken = await user.getIdToken();
-
-      // Save user to Redux
-      dispatch(
-        addUser({
-          uid: user.uid,
-          email: user.email,
-          name: user.displayName,
-        })
-      );
-
-      // Optional: Send token to FastAPI
-      await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/firebase`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-          },
-        }
-      );
-
-      toast.success("Google sign-in successful!");
-    } catch (error) {
-      toast.error(error.message);
+      console.log("err",err)
+      if (err.code === "auth/wrong-password") {
+        toast.error("Incorrect password.");
+      } else if (err.code === "auth/user-not-found") {
+        toast.error("No user found with this email.");
+      } else {
+        toast.error(err.message);
+      }
     }
   };
+
   return (
     <Box
       sx={{
@@ -109,71 +102,103 @@ export const Login = () => {
     >
       <Container maxWidth="sm">
         <Paper elevation={3} sx={{ p: 4 }}>
-          <Button
-            startIcon={<GoogleIcon sx={{ color: "black" }} />}
-            variant="outlined"
-            fullWidth
-            onClick={handleGoogleLogin}
+          <Tabs value={tabIndex} onChange={handleChange} centered>
+            <Tab label="Email & Password" />
+            <Tab label="Magic Link" />
+          </Tabs>
+
+          <Box
             sx={{
-              mb: 2,
-              borderColor: "black",
-              color: "black",
-              "&:hover": {
-                borderColor: "black",
-                backgroundColor: "#f0f0f0",
-              },
+              minHeight: { xs: "400px", sm: "450px" },
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              mt: 2,
             }}
           >
-            Continue with Google
-          </Button>
-          <Typography variant="h5" fontWeight={600} gutterBottom>
-            Login to Nutrivue
-          </Typography>
-          <form onSubmit={handleSubmit}>
-            <TextField
-              label="Email"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <TextField
-              label="Password"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <Button
-              type="submit"
-              variant="contained"
-              fullWidth
-              sx={{
-                mt: 2,
-                backgroundColor: "black",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "#333",
-                },
-              }}
+            {tabIndex === 0 && (
+              <>
+                <Box>
+                  <Button
+                    startIcon={<GoogleIcon sx={{ color: "black" }} />}
+                    variant="outlined"
+                    fullWidth
+                    onClick={signInWithGoogle}
+                    sx={{
+                      mb: 2,
+                      borderColor: "black",
+                      color: "black",
+                      "&:hover": {
+                        borderColor: "black",
+                        backgroundColor: "#f0f0f0",
+                      },
+                    }}
+                  >
+                    Continue with Google
+                  </Button>
+                  {/* Divider with "or" */}
+                  <Divider sx={{ my: 3 }}>
+                    <Typography variant="body2" sx={{ color: "gray" }}>
+                      or
+                    </Typography>
+                  </Divider>
+                  <Typography variant="h5" fontWeight={600} gutterBottom>
+                    Login to Nutrivue
+                  </Typography>
+                  <form onSubmit={handleSubmit}>
+                    <TextField
+                      label="Email"
+                      variant="outlined"
+                      fullWidth
+                      margin="normal"
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                    <TextField
+                      label="Password"
+                      variant="outlined"
+                      fullWidth
+                      margin="normal"
+                      type="password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      fullWidth
+                      sx={{
+                        mt: 2,
+                        backgroundColor: "black",
+                        color: "white",
+                        "&:hover": {
+                          backgroundColor: "#333",
+                        },
+                      }}
+                    >
+                      Sign In
+                    </Button>
+                  </form>
+                </Box>
+              </>
+            )}
+
+            {tabIndex === 1 && (
+              <PasswordlessEmailForm title="Login with Email Link" />
+            )}
+
+            <Typography
+              variant="body2"
+              align="center"
+              sx={{ mt: 3, cursor: "pointer", color: "black" }}
+              onClick={() => navigate("/register")}
             >
-              Sign In
-            </Button>
-          </form>
-          <Typography
-            variant="body2"
-            align="center"
-            sx={{ mt: 2, cursor: "pointer", color: "black" }}
-            onClick={() => navigate("/register")}
-          >
-            Don&apos;t have an account? Sign Up
-          </Typography>
+              Don&apos;t have an account? Sign Up
+            </Typography>
+          </Box>
         </Paper>
       </Container>
     </Box>

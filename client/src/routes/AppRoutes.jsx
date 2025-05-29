@@ -8,6 +8,7 @@ import { PrivateLayout } from "../layouts/PrivateLayout";
 import { Dashboard } from "../pages/PrivatePages/Dashboard";
 import { Profile } from "../pages/PrivatePages/Profile";
 import { NotFound } from "../pages/NotFound";
+import { VerifyPage } from "../pages/Auth/VerifyPage";
 
 function AppRoutes() {
   return (
@@ -17,6 +18,7 @@ function AppRoutes() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Signup />} />
+        <Route path="/verify" element={<VerifyPage />} />
       </Route>
 
       {/* Protected Routes with DashboardLayout */}

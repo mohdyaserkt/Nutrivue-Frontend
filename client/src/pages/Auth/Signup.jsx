@@ -6,13 +6,14 @@ import {
   Button,
   Typography,
   Paper,
+  Tabs,
+  Tab,
+  Divider,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import {
   createUserWithEmailAndPassword,
-  getIdToken,
-  GoogleAuthProvider,
-  signInWithPopup,
+  fetchSignInMethodsForEmail,
 } from "firebase/auth";
 import { auth } from "../../utils/firebase";
 import toast from "react-hot-toast";
@@ -20,7 +21,11 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { addUser } from "../../redux/slice/userSlice";
 import GoogleIcon from "@mui/icons-material/Google";
+import { PasswordlessEmailForm } from "../../components/PrivateLayout/PasswordlessEmailForm";
+import { useGoogleAuth } from "../../hooks/useGoogleAuth";
 export const Signup = () => {
+  const [tabIndex, setTabIndex] = useState(0);
+  const { signInWithGoogle } = useGoogleAuth();
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -42,23 +47,32 @@ export const Signup = () => {
       return;
     }
     try {
+      const methods =  fetchSignInMethodsForEmail(auth, form?.email).then(data => console.log("🔥 data after refresh:", data));
+  
+      // if (methods.includes("google.com") && !methods.includes("password")) {
+      //   toast.error(
+      //     "This email is already registered via Google. You can’t sign up with a password."
+      //   );
+      //   return;
+      // }
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         form.email,
         form.password
       );
+      console.log("userCredential=",userCredential)
       const firebaseUser = userCredential.user;
       const idToken = await firebaseUser.getIdToken();
-      await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/firebase`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      // await axios.post(
+      //   `${import.meta.env.VITE_API_BASE_URL}/auth/firebase`,
+      //   {},
+      //   {
+      //     headers: {
+      //       Authorization: `Bearer ${idToken}`,
+      //       "Content-Type": "application/json",
+      //     },
+      //   }
+      // );
       localStorage.setItem("accessToken", idToken);
       const userData = {
         uid: firebaseUser.uid,
@@ -67,45 +81,12 @@ export const Signup = () => {
       };
 
       dispatch(addUser(userData));
+      navigate("/dashboard");
+
       toast("Signup successful!");
     } catch (err) {
+      console.log(err)
       toast(err.message);
-    }
-    console.log(form);
-  };
-  const handleGoogleLogin = async () => {
-    const provider = new GoogleAuthProvider();
-
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-
-      // Optional: Get ID token if sending to backend
-      const idToken = await user.getIdToken();
-
-      // Save user to Redux
-      dispatch(
-        addUser({
-          uid: user.uid,
-          email: user.email,
-          name: user.displayName,
-        })
-      );
-
-      // Optional: Send token to FastAPI
-      await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/firebase`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-          },
-        }
-      );
-
-      toast.success("Google sign-in successful!");
-    } catch (error) {
-      toast.error(error.message);
     }
   };
 
@@ -123,94 +104,127 @@ export const Signup = () => {
     >
       <Container maxWidth="sm">
         <Paper elevation={3} sx={{ p: 4 }}>
-          <Button
-            startIcon={<GoogleIcon sx={{ color: "black" }} />}
-            variant="outlined"
-            fullWidth
-            onClick={handleGoogleLogin}
+          <Tabs
+            value={tabIndex}
+            onChange={(e, newValue) => setTabIndex(newValue)}
+            centered
+          >
+            <Tab label="Standard Sign Up" />
+            <Tab label="Passwordless Sign Up" />
+          </Tabs>
+
+          <Box
             sx={{
-              mb: 2,
-              borderColor: "black",
-              color: "black",
-              "&:hover": {
-                borderColor: "black",
-                backgroundColor: "#f0f0f0",
-              },
+              mt: 4,
+              minHeight: "480px",
+              transition: "min-height 0.3s ease",
             }}
           >
-            Continue with Google
-          </Button>
-          <Typography variant="h5" fontWeight={600} gutterBottom>
-            Create Your Account
-          </Typography>
-          <form onSubmit={handleSubmit}>
-            <TextField
-              label="Username"
-              name="username"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              required
-              value={form.username}
-              onChange={handleChange}
-            />
-            <TextField
-              label="Email"
-              name="email"
-              type="email"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              required
-              value={form.email}
-              onChange={handleChange}
-            />
-            <TextField
-              label="Password"
-              name="password"
-              type="password"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              required
-              value={form.password}
-              onChange={handleChange}
-            />
-            <TextField
-              label="Confirm Password"
-              name="confirmPassword"
-              type="password"
-              variant="outlined"
-              fullWidth
-              margin="normal"
-              required
-              value={form.confirmPassword}
-              onChange={handleChange}
-            />
-            <Button
-              type="submit"
-              variant="contained"
-              fullWidth
-              sx={{
-                mt: 2,
-                backgroundColor: "black",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "#333",
-                },
-              }}
+            {tabIndex === 0 && (
+              <>
+                <Button
+                  startIcon={<GoogleIcon sx={{ color: "black" }} />}
+                  variant="outlined"
+                  fullWidth
+                  onClick={signInWithGoogle}
+                  sx={{
+                    mb: 1,
+                    borderColor: "black",
+                    color: "black",
+                    "&:hover": {
+                      borderColor: "black",
+                      backgroundColor: "#f0f0f0",
+                    },
+                  }}
+                >
+                  Continue with Google
+                </Button>
+
+                <Divider sx={{ my: 1 }}>
+                  <Typography variant="body2" sx={{ color: "gray" }}>
+                    or
+                  </Typography>
+                </Divider>
+
+                <Typography variant="h5" fontWeight={600} gutterBottom>
+                  Create Your Account
+                </Typography>
+                <form onSubmit={handleSubmit}>
+                  <TextField
+                    label="Username"
+                    name="username"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    required
+                    value={form.username}
+                    onChange={handleChange}
+                  />
+                  <TextField
+                    label="Email"
+                    name="email"
+                    type="email"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    required
+                    value={form.email}
+                    onChange={handleChange}
+                  />
+                  <TextField
+                    label="Password"
+                    name="password"
+                    type="password"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    required
+                    value={form.password}
+                    onChange={handleChange}
+                  />
+                  <TextField
+                    label="Confirm Password"
+                    name="confirmPassword"
+                    type="password"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    required
+                    value={form.confirmPassword}
+                    onChange={handleChange}
+                  />
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    fullWidth
+                    sx={{
+                      mt: 2,
+                      backgroundColor: "black",
+                      color: "white",
+                      "&:hover": {
+                        backgroundColor: "#333",
+                      },
+                    }}
+                  >
+                    Sign Up
+                  </Button>
+                </form>
+              </>
+            )}
+
+            {tabIndex === 1 && (
+              <PasswordlessEmailForm title="Sign Up with Magic Link" />
+            )}
+
+            <Typography
+              variant="body2"
+              align="center"
+              sx={{ mt: 4, cursor: "pointer", color: "black" }}
+              onClick={() => navigate("/login")}
             >
-              Sign Up
-            </Button>
-          </form>
-          <Typography
-            variant="body2"
-            align="center"
-            sx={{ mt: 2, cursor: "pointer", color: "black" }}
-            onClick={() => navigate("/login")}
-          >
-            Already have an account? Sign In
-          </Typography>
+              Already have an account? Sign In
+            </Typography>
+          </Box>
         </Paper>
       </Container>
     </Box>
