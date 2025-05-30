@@ -1,5 +1,9 @@
 import { useDispatch } from "react-redux";
-import { fetchSignInMethodsForEmail, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import {
+  fetchSignInMethodsForEmail,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
 import { auth } from "../utils/firebase";
 import { addUser } from "../redux/slice/userSlice";
 import toast from "react-hot-toast";
@@ -13,13 +17,12 @@ export const useGoogleAuth = () => {
     const provider = new GoogleAuthProvider();
 
     try {
-       
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       const isNewUser = result._tokenResponse?.isNewUser;
 
       const idToken = await user.getIdToken();
-         console.log("token==",idToken);
+      console.log("token==", idToken);
       //  Store the access token
       localStorage.setItem("accessToken", idToken);
       dispatch(
@@ -29,16 +32,18 @@ export const useGoogleAuth = () => {
           name: user.displayName,
         })
       );
+      if (isNewUser) {
+        await axios.post(
+          `${import.meta.env.VITE_API_BASE_URL}/users/save-user`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${idToken}`,
+            },
+          }
+        );
+      }
 
-      //   await axios.post(
-      //     `${import.meta.env.VITE_API_BASE_URL}/auth/firebase`,
-      //     {},
-      //     {
-      //       headers: {
-      //         Authorization: `Bearer ${idToken}`,
-      //       },
-      //     }
-      //   );
       navigate("/dashboard");
 
       toast.success(

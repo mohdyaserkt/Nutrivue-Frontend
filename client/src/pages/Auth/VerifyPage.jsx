@@ -34,6 +34,18 @@ export const VerifyPage = () => {
           );
 
           localStorage.removeItem("emailForSignIn");
+
+          if (isNewUser) {
+            await axios.post(
+              `${import.meta.env.VITE_API_BASE_URL}/users/save-user`,
+              {},
+              {
+                headers: {
+                  Authorization: `Bearer ${idToken}`,
+                },
+              }
+            );
+          }
           toast.success(isNewUser ? "Account created!" : "Welcome back!");
 
           setStatus("done");

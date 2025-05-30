@@ -47,8 +47,10 @@ export const Signup = () => {
       return;
     }
     try {
-      const methods =  fetchSignInMethodsForEmail(auth, form?.email).then(data => console.log("🔥 data after refresh:", data));
-  
+      const methods = fetchSignInMethodsForEmail(auth, form?.email).then(
+        (data) => console.log("🔥 data after refresh:", data)
+      );
+
       // if (methods.includes("google.com") && !methods.includes("password")) {
       //   toast.error(
       //     "This email is already registered via Google. You can’t sign up with a password."
@@ -60,19 +62,20 @@ export const Signup = () => {
         form.email,
         form.password
       );
-      console.log("userCredential=",userCredential)
+      console.log("userCredential=", userCredential);
       const firebaseUser = userCredential.user;
       const idToken = await firebaseUser.getIdToken();
-      // await axios.post(
-      //   `${import.meta.env.VITE_API_BASE_URL}/auth/firebase`,
-      //   {},
-      //   {
-      //     headers: {
-      //       Authorization: `Bearer ${idToken}`,
-      //       "Content-Type": "application/json",
-      //     },
-      //   }
-      // );
+
+      await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/users/save-user`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       localStorage.setItem("accessToken", idToken);
       const userData = {
         uid: firebaseUser.uid,
@@ -85,7 +88,7 @@ export const Signup = () => {
 
       toast("Signup successful!");
     } catch (err) {
-      console.log(err)
+      console.log(err);
       toast(err.message);
     }
   };

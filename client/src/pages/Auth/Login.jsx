@@ -58,16 +58,6 @@ export const Login = () => {
       const idToken = await firebaseUser.getIdToken();
    
       console.log("idToken==",idToken)
-      // await axios.post(
-      //   `${import.meta.env.VITE_API_BASE_URL}/auth/firebase`,
-      //   {},
-      //   {
-      //     headers: {
-      //       Authorization: `Bearer ${idToken}`,
-      //       "Content-Type": "application/json",
-      //     },
-      //   }
-      // );
       localStorage.setItem("accessToken", idToken);
       const userData = {
         uid: firebaseUser.uid,
