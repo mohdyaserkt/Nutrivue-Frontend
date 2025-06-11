@@ -1,5 +1,16 @@
-import  { useState, useCallback } from "react";
-import { Box, Button, Typography, Paper } from "@mui/material";
+import { useState, useCallback } from "react";
+import {
+  Box,
+  Button,
+  Typography,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@mui/material";
 import { useDropzone } from "react-dropzone";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../../utils/axiosInstance";
@@ -34,14 +45,14 @@ export const ImageUpload = () => {
     console.log("formData==", formData);
     try {
       setUploading(true);
-      const response = await axiosInstance.post("/upload", formData, {
+      const response = await axiosInstance.post("/calorie/analyze", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
       setCalorieData(response.data);
       console.log("Upload success:", response.data);
-      toast(`Calories detected: ${response.data.calories}`);
+      toast.success(`Upload success`);
     } catch (error) {
       console.error("Upload failed:", error);
       toast.error("Image upload failed. Please try again.");
@@ -117,17 +128,53 @@ export const ImageUpload = () => {
           <Typography variant="h6">
             🥗 Calories Detected: {calorieData.calories} kcal
           </Typography>
-          {/* Optional: if your API returns food breakdown, list it here */}
-          {calorieData.breakdown && (
-            <Box mt={1}>
-              <Typography variant="subtitle2">Food Breakdown:</Typography>
-              <ul>
-                {calorieData.breakdown.map((item, idx) => (
-                  <li key={idx}>
-                    {item.name}: {item.calories} kcal
-                  </li>
-                ))}
-              </ul>
+          {/* if your API returns food breakdown, list it here */}
+          {calorieData.items && (
+            <Box mt={3}>
+              <Typography variant="h6" gutterBottom>
+                🍽️ Food Breakdown
+              </Typography>
+              <TableContainer component={Paper}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>
+                        <strong>Name</strong>
+                      </TableCell>
+                      <TableCell>
+                        <strong>Calories/gram</strong>
+                      </TableCell>
+                      <TableCell>
+                        <strong>Protein (g)</strong>
+                      </TableCell>
+                      <TableCell>
+                        <strong>Carbs (g)</strong>
+                      </TableCell>
+                      <TableCell>
+                        <strong>Fats (g)</strong>
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {calorieData.items.map((item, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{item.name}</TableCell>
+                        <TableCell>{item.calories_per_gram}</TableCell>
+                        <TableCell>{item.nutrients?.protein_g}</TableCell>
+                        <TableCell>{item.nutrients?.carbohydrates_g}</TableCell>
+                        <TableCell>{item.nutrients?.fats_g}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+          )}
+
+          {calorieData.healthy_alternatives && (
+            <Box mt={3}>
+              <Typography variant="h6">💡 Healthy Alternatives</Typography>
+              <Typography>{calorieData.healthy_alternatives}</Typography>
             </Box>
           )}
         </Box>

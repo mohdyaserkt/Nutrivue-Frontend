@@ -17,7 +17,6 @@ import {
 } from "firebase/auth";
 import { auth } from "../../utils/firebase";
 import toast from "react-hot-toast";
-import axios from "axios";
 import { useDispatch } from "react-redux";
 import { addUser } from "../../redux/slice/userSlice";
 import GoogleIcon from "@mui/icons-material/Google";
@@ -41,12 +40,12 @@ export const Login = () => {
     try {
       const methods = await fetchSignInMethodsForEmail(auth, email);
       console.log("methods==", methods);
-   if (methods.includes("google.com") && !methods.includes("password")) {
-          toast.error(
-            "This email is registered via Google. Please use Google Login."
-          );
-          return;
-        }
+      if (methods.includes("google.com") && !methods.includes("password")) {
+        toast.error(
+          "This email is registered via Google. Please use Google Login."
+        );
+        return;
+      }
 
       const userCredential = await signInWithEmailAndPassword(
         auth,
@@ -56,8 +55,8 @@ export const Login = () => {
 
       const firebaseUser = userCredential.user;
       const idToken = await firebaseUser.getIdToken();
-   
-      console.log("idToken==",idToken)
+
+      console.log("idToken==", idToken);
       localStorage.setItem("accessToken", idToken);
       const userData = {
         uid: firebaseUser.uid,
@@ -67,7 +66,7 @@ export const Login = () => {
       navigate("/dashboard");
       toast("Login successful!");
     } catch (err) {
-      console.log("err",err)
+      console.log("err", err);
       if (err.code === "auth/wrong-password") {
         toast.error("Incorrect password.");
       } else if (err.code === "auth/user-not-found") {
