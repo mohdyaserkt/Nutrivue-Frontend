@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { addUser } from "../../redux/slice/userSlice";
 import axios from "axios";
 import { Box, Container, Paper, Typography } from "@mui/material";
+import { axiosInstance } from "../../utils/axiosInstance";
 
 export const VerifyPage = () => {
   const navigate = useNavigate();
@@ -25,14 +26,6 @@ export const VerifyPage = () => {
           const idToken = await user.getIdToken();
           localStorage.setItem("accessToken", idToken);
 
-          dispatch(
-            addUser({
-              uid: user.uid,
-              email: user.email,
-              name: user.displayName || "",
-            })
-          );
-
           localStorage.removeItem("emailForSignIn");
 
           if (isNewUser) {
@@ -44,6 +37,24 @@ export const VerifyPage = () => {
                   Authorization: `Bearer ${idToken}`,
                 },
               }
+            );
+
+            const response = await axiosInstance.get("/users/me", {
+              headers: {
+                Authorization: `Bearer ${idToken}`,
+                "Content-Type": "application/json",
+              },
+            });
+            console.log(response.data, "==response.data");
+
+            dispatch(addUser(response?.data));
+          } else {
+            dispatch(
+              addUser({
+                uid: user.uid,
+                email: user.email,
+                name: user?.displayName || "",
+              })
             );
           }
           toast.success(isNewUser ? "Account created!" : "Welcome back!");
