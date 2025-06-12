@@ -14,7 +14,8 @@ export const Dashboard = () => {
     "height_cm",
     "activity_level",
     "goal",
-    "customCalorie",
+    "target_calories",
+    'email'
   ];
   const isModalOpen = !REQUIRED_KEYS.every((key) => {
     const value = user?.[key];

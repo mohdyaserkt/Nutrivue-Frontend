@@ -22,6 +22,7 @@ import { addUser } from "../../redux/slice/userSlice";
 import GoogleIcon from "@mui/icons-material/Google";
 import { PasswordlessEmailForm } from "../../components/PrivateLayout/PasswordlessEmailForm";
 import { useGoogleAuth } from "../../hooks/useGoogleAuth";
+import { axiosInstance } from "../../utils/axiosInstance";
 export const Login = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const [email, setEmail] = useState("");
@@ -62,9 +63,18 @@ export const Login = () => {
         uid: firebaseUser.uid,
         email: firebaseUser.email,
       };
-      dispatch(addUser(userData));
+
+      const response = await axiosInstance.get("/users/me",{
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+            "Content-Type": "application/json",
+          },
+        });
+      console.log( response.data, "==response.data");
+
+      dispatch(addUser(response?.data));
       navigate("/dashboard");
-      toast("Login successful!");
+      toast.success("Login successful!");
     } catch (err) {
       console.log("err", err);
       if (err.code === "auth/wrong-password") {
