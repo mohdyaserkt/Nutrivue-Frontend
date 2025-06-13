@@ -59,6 +59,7 @@ export const ImageUpload = () => {
       setCalorieData(response.data);
       console.log("Upload success:", response.data);
       toast.success(`Upload success`);
+      setConsumedGrams({});
     } catch (error) {
       console.error("Upload failed:", error);
       toast.error("Image upload failed. Please try again.");
@@ -102,10 +103,23 @@ export const ImageUpload = () => {
       toast.error("Failed to submit consumed data.");
     }
   };
-  const nutrientKeys = Array.from(
-    new Set(
-      calorieData?.items.flatMap((item) => Object.keys(item.nutrients || {}))
-    )
+  const nutrientKeys = calorieData?.items?.length
+    ? Array.from(
+        new Set(
+          calorieData.items.flatMap((item) => Object.keys(item.nutrients || {}))
+        )
+      )
+    : [];
+
+  const loggedNutrientKeys = loggedItems?.length
+    ? Array.from(
+        new Set(
+          loggedItems.flatMap((item) => Object.keys(item.nutrients || {}))
+        )
+      )
+    : [];
+  const hasAnyInput = Object.values(consumedGrams).some(
+    (val) => Number(val) > 0
   );
 
   return (
@@ -254,7 +268,11 @@ export const ImageUpload = () => {
                     variant="contained"
                     color="primary"
                     onClick={handleSubmitConsumedData}
-                    disabled={uploading || calorieData.items.length === 0}
+                    disabled={
+                      uploading ||
+                      calorieData.items.length === 0 ||
+                      !hasAnyInput
+                    }
                   >
                     Submit Consumed Data
                   </Button>
@@ -275,7 +293,7 @@ export const ImageUpload = () => {
       {loggedItems.length > 0 && (
         <Box mt={4}>
           <Typography variant="h6" gutterBottom>
-             Logged Food Entries
+            Logged Food Entries
           </Typography>
           <TableContainer component={Paper}>
             <Table>
@@ -290,15 +308,14 @@ export const ImageUpload = () => {
                   <TableCell>
                     <strong>Calories</strong>
                   </TableCell>
-                  <TableCell>
-                    <strong>Protein (g)</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Carbs (g)</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Fats (g)</strong>
-                  </TableCell>
+
+                  {/* Dynamic nutrient headers */}
+                  {loggedNutrientKeys.map((key) => (
+                    <TableCell key={key}>
+                      <strong>{key.replace(/_/g, " ")}</strong>
+                    </TableCell>
+                  ))}
+
                   <TableCell>
                     <strong>Meal</strong>
                   </TableCell>
@@ -307,15 +324,21 @@ export const ImageUpload = () => {
                   </TableCell>
                 </TableRow>
               </TableHead>
+
               <TableBody>
                 {loggedItems.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell>{item.food_name}</TableCell>
                     <TableCell>{item.weight_grams}</TableCell>
                     <TableCell>{item.calories_consumed}</TableCell>
-                    <TableCell>{item.protein_g}</TableCell>
-                    <TableCell>{item.carbs_g}</TableCell>
-                    <TableCell>{item.fats_g}</TableCell>
+
+                    {/* Dynamic nutrient values */}
+                    {loggedNutrientKeys.map((key) => (
+                      <TableCell key={key}>
+                        {item.nutrients?.[key] ?? "-"}
+                      </TableCell>
+                    ))}
+
                     <TableCell>{item.meal_type}</TableCell>
                     <TableCell>
                       {new Date(item.logged_at).toLocaleString()}
