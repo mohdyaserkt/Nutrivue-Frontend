@@ -7,6 +7,7 @@ export const Dashboard = () => {
   const [open, setOpen] = useState(false);
   const user = useSelector((state) => state?.user);
   console.log("user===", user);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const REQUIRED_KEYS = [
     "name",
     "age",
@@ -30,8 +31,8 @@ export const Dashboard = () => {
   }, [isModalOpen]);
   return (
     <>
-      <CalorieChart />
-      <ImageUpload />
+      <CalorieChart isSubmitted={isSubmitted} />
+      <ImageUpload setIsSubmitted={setIsSubmitted} isSubmitted={isSubmitted} />
 
       {<DetailsModal open={open} onClose={() => setOpen(false)} />}
     </>

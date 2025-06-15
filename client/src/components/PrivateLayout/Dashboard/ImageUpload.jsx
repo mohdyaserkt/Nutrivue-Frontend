@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import {
   Box,
   Button,
@@ -17,7 +17,12 @@ import {
 import { useDropzone } from "react-dropzone";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../../utils/axiosInstance";
-export const ImageUpload = () => {
+import { Pie } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+
+ChartJS.register(ArcElement, Tooltip, Legend);
+
+export const ImageUpload = ({ isSubmitted, setIsSubmitted }) => {
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -38,6 +43,8 @@ export const ImageUpload = () => {
       "image/*": [],
     },
     multiple: false,
+    maxSize: 5 * 1024 * 1024, // 5MB
+    onDropRejected: () => toast.error("Image too large (max 5MB)"),
   });
 
   const handleUploadClick = async () => {
@@ -56,10 +63,16 @@ export const ImageUpload = () => {
           "Content-Type": "multipart/form-data",
         },
       });
+      if (!response.data?.items || response.data?.items.length === 0) {
+        toast.error("No food items detected. Try another image.");
+        return;
+      }
+
       setCalorieData(response.data);
       console.log("Upload success:", response.data);
       toast.success(`Upload success`);
       setConsumedGrams({});
+      setIsSubmitted(false);
     } catch (error) {
       console.error("Upload failed:", error);
       toast.error("Image upload failed. Please try again.");
@@ -72,12 +85,25 @@ export const ImageUpload = () => {
   };
 
   const handleConsumedChange = (index, value) => {
-    setConsumedGrams((prev) => ({
-      ...prev,
-      [index]: value,
-    }));
+    const parsed = parseFloat(value);
+    if (!isNaN(parsed) && parsed >= 0) {
+      setConsumedGrams((prev) => ({
+        ...prev,
+        [index]: parsed,
+      }));
+    } else if (value === "") {
+      setConsumedGrams((prev) => ({
+        ...prev,
+        [index]: "",
+      }));
+    }
   };
+
   const handleSubmitConsumedData = async () => {
+    if (isSubmitted) {
+      toast.error("You have already submitted this data.");
+      return;
+    }
     if (!mealType) {
       toast.error("Please select a meal type.");
       return;
@@ -98,6 +124,7 @@ export const ImageUpload = () => {
       setLoggedItems(response?.data);
       toast.success("Consumed data submitted successfully!");
       console.log("Submitted data:", response.data);
+      setIsSubmitted(true);
     } catch (err) {
       console.error(err);
       toast.error("Failed to submit consumed data.");
@@ -121,6 +148,47 @@ export const ImageUpload = () => {
   const hasAnyInput = Object.values(consumedGrams).some(
     (val) => Number(val) > 0
   );
+  const getNutrientPieData = () => {
+    const totalNutrients = {};
+
+    loggedItems.forEach((item) => {
+      Object.keys(item).forEach((key) => {
+        if (key.endsWith("_g")) {
+          const val = parseFloat(item[key]);
+          if (!isNaN(val)) {
+            totalNutrients[key] = (totalNutrients[key] || 0) + val;
+          }
+        }
+      });
+    });
+
+    const labels = Object.keys(totalNutrients).map((key) =>
+      key.replace(/_g$/, "").toUpperCase()
+    );
+    const data = Object.values(totalNutrients);
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: "Nutrients",
+          data,
+          backgroundColor: [
+            "#FF6384",
+            "#36A2EB",
+            "#FFCE56",
+            "#4BC0C0",
+            "#9966FF",
+            "#FF9F40",
+            "#8BC34A",
+            "#FF5722",
+          ],
+        },
+      ],
+    };
+  };
+  const pieData = useMemo(() => getNutrientPieData(), [loggedItems]);
+  const hasNutrientData = pieData.datasets?.[0]?.data?.some((val) => val > 0);
 
   return (
     <Box sx={{ width: "100%", maxWidth: 1000, mx: "auto", mt: 4 }}>
@@ -134,7 +202,7 @@ export const ImageUpload = () => {
       </Button>
 
       <Paper
-        {...getRootProps()}
+        {...getRootProps({ disabled: uploading })}
         elevation={3}
         sx={{
           mt: 2,
@@ -175,6 +243,10 @@ export const ImageUpload = () => {
                 setPreviewUrl(null);
                 setImageFile(null);
                 setCalorieData(null);
+                setConsumedGrams({});
+                setIsSubmitted(() => false);
+                setLoggedItems([]);
+                setMealType("");
               }}
               sx={{ mt: 1 }}
               fullWidth
@@ -270,8 +342,9 @@ export const ImageUpload = () => {
                     onClick={handleSubmitConsumedData}
                     disabled={
                       uploading ||
-                      calorieData.items.length === 0 ||
-                      !hasAnyInput
+                      !calorieData?.items?.length ||
+                      !hasAnyInput ||
+                      isSubmitted
                     }
                   >
                     Submit Consumed Data
@@ -291,63 +364,27 @@ export const ImageUpload = () => {
       )}
 
       {loggedItems.length > 0 && (
-        <Box mt={4}>
+        <Box sx={{ maxWidth: 400, mx: "auto", height: 400 }} mt={4}>
           <Typography variant="h6" gutterBottom>
             Logged Food Entries
           </Typography>
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>
-                    <strong>Food</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Weight (g)</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Calories</strong>
-                  </TableCell>
-
-                  {/* Dynamic nutrient headers */}
-                  {loggedNutrientKeys.map((key) => (
-                    <TableCell key={key}>
-                      <strong>{key.replace(/_/g, " ")}</strong>
-                    </TableCell>
-                  ))}
-
-                  <TableCell>
-                    <strong>Meal</strong>
-                  </TableCell>
-                  <TableCell>
-                    <strong>Logged At</strong>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-
-              <TableBody>
-                {loggedItems.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>{item.food_name}</TableCell>
-                    <TableCell>{item.weight_grams}</TableCell>
-                    <TableCell>{item.calories_consumed}</TableCell>
-
-                    {/* Dynamic nutrient values */}
-                    {loggedNutrientKeys.map((key) => (
-                      <TableCell key={key}>
-                        {item.nutrients?.[key] ?? "-"}
-                      </TableCell>
-                    ))}
-
-                    <TableCell>{item.meal_type}</TableCell>
-                    <TableCell>
-                      {new Date(item.logged_at).toLocaleString()}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          {loggedItems.length > 0 && (
+            <Box mt={4}>
+              <Typography variant="h6" gutterBottom>
+                Nutrient Distribution (Pie Chart)
+              </Typography>
+              {console.log("Pie chart data:", getNutrientPieData())}
+              <Box sx={{ maxWidth: 400, mx: "auto" }}>
+                {hasNutrientData ? (
+                  <Pie data={pieData} />
+                ) : (
+                  <Typography color="text.secondary">
+                    No nutrient data available to display.
+                  </Typography>
+                )}
+              </Box>
+            </Box>
+          )}
         </Box>
       )}
     </Box>

@@ -15,6 +15,7 @@ import { clearUser } from "../../redux/slice/userSlice";
 import { signOut } from "firebase/auth";
 import { auth } from "../../utils/firebase";
 import toast from "react-hot-toast";
+import { axiosInstance } from "../../utils/axiosInstance";
 export const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -30,6 +31,7 @@ export const Navbar = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth); // Firebase logout
+      handleMenuClose();
       localStorage.removeItem("accessToken");
       dispatch(clearUser());
       toast("Logout Successfully");
@@ -42,7 +44,10 @@ export const Navbar = () => {
     handleMenuClose();
     navigate("/profile");
   };
-
+  const handleLogsClick = () => {
+    handleMenuClose()
+    navigate("/logs");
+  };
   return (
     <AppBar position="static" color="primary" elevation={1}>
       <Toolbar sx={{ justifyContent: "space-between" }}>
@@ -67,7 +72,7 @@ export const Navbar = () => {
             transformOrigin={{ vertical: "top", horizontal: "right" }}
           >
             <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
-            <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
+            <MenuItem onClick={handleLogsClick}>Logs</MenuItem>
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </Box>

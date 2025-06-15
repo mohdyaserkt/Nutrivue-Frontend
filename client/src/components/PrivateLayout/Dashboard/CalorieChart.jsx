@@ -11,14 +11,16 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { useEffect, useState } from "react";
 import { axiosInstance } from "../../../utils/axiosInstance";
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-export const CalorieChart = () => {
+export const CalorieChart = ({ isSubmitted }) => {
+  const userDetails = useSelector((state) => state?.user);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const today = new Date().toISOString().split("T")[0];
-  const targetCalories = 6000;
+  const targetCalories = userDetails?.target_calories || 6000;
 
   const [calorieData, setCalorieData] = useState({});
 
@@ -34,7 +36,7 @@ export const CalorieChart = () => {
 
   useEffect(() => {
     fetchTodaysCalorie();
-  }, []);
+  }, [isSubmitted]);
 
   const remainingCalories = Math.max(
     targetCalories - calorieData?.total_calories,
