@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Card,
@@ -17,17 +17,14 @@ import WcIcon from "@mui/icons-material/Wc";
 import HeightIcon from "@mui/icons-material/Height";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import { axiosInstance } from "../../utils/axiosInstance";
+import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
 
 export const Profile = () => {
   const [editMode, setEditMode] = useState(false);
-  const [user, setUser] = useState({
-    email: "alice@example.com",
-    username: "alice25",
-    age: 25,
-    gender: "Female",
-    weight: "60 kg",
-    height: "165 cm",
-  });
+  const userDetails = useSelector((state) => state.user);
+  const [user, setUser] = useState(userDetails);
+  console.log("user===", userDetails);
 
   const handleChange = (field, value) => {
     setUser((prev) => ({ ...prev, [field]: value }));
@@ -35,13 +32,14 @@ export const Profile = () => {
 
   const handleSave = async () => {
     try {
-      const response = await axiosInstance.put("/profile/update", user);
+      const response = await axiosInstance.post("/users/save-user", user);
       console.log("Updated user:", response.data);
-      alert("Profile updated successfully!");
+      toast.success("Profile updated successfully!");
+
       setEditMode(false);
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("Failed to update profile.");
+      toast.error("Failed to update profile.");
     }
   };
 
@@ -96,16 +94,37 @@ export const Profile = () => {
             <ProfileField
               icon={<FitnessCenterIcon />}
               label="Weight"
-              value={user.weight}
+              value={user.weight_kg}
               editable={editMode}
               onChange={(v) => handleChange("weight", v)}
             />
             <ProfileField
               icon={<HeightIcon />}
               label="Height"
-              value={user.height}
+              value={user.height_cm}
               editable={editMode}
               onChange={(v) => handleChange("height", v)}
+            />
+            <ProfileField
+              icon={<HeightIcon />}
+              label="ActivityLevel"
+              value={user.activity_level}
+              editable={editMode}
+              onChange={(v) => handleChange("activity_level", v)}
+            />
+            <ProfileField
+              icon={<HeightIcon />}
+              label="Goal"
+              value={user.goal}
+              editable={editMode}
+              onChange={(v) => handleChange("goal", v)}
+            />
+            <ProfileField
+              icon={<HeightIcon />}
+              label="TargetCalorie"
+              value={user?.target_calories}
+              editable={editMode}
+              onChange={(v) => handleChange("Target_calories", v)}
             />
           </Grid>
 
