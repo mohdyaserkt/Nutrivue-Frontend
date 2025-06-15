@@ -1,47 +1,48 @@
-
-import { Box, Typography, Container, Grid, Link } from '@mui/material';
-
+// src/components/Footer/Footer.jsx
+import { footerData } from '../../data/footer';
+import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
+import '../../pages/LandingPage/landingpage.css';
+import '../../pages/LandingPage/animations.css';
 export const Footer = () => {
   return (
-    <Box sx={{ backgroundColor: 'black', color: 'white', py: 4, mt: 'auto' }}>
-      <Container maxWidth="lg">
-        <Grid container spacing={4}>
-          {/* Company Info */}
-          <Grid item xs={12} md={4}>
-            <Typography variant="h6" gutterBottom>
-              Nutrivue
-            </Typography>
-            <Typography variant="body2">
-              Empowering health through personalized nutrition insights.
-            </Typography>
-          </Grid>
-
-          {/* Contact Info */}
-          <Grid item xs={12} md={4}>
-            <Typography variant="h6" gutterBottom>
-              Contact
-            </Typography>
-            <Typography variant="body2">Email: support@nutrivue.com</Typography>
-            <Typography variant="body2">Phone: +1 (555) 123-4567</Typography>
-          </Grid>
-
-          {/* Location */}
-          <Grid item xs={12} md={4}>
-            <Typography variant="h6" gutterBottom>
-              Location
-            </Typography>
-            <Typography variant="body2">123 Wellness St.</Typography>
-            <Typography variant="body2">Health City, HC 98765</Typography>
-          </Grid>
-        </Grid>
-
-        {/* Divider */}
-        <Box mt={4} textAlign="center">
-          <Typography variant="body2" color="grey.500">
-            &copy; {new Date().getFullYear()} Nutrivue. All rights reserved.
-          </Typography>
-        </Box>
-      </Container>
-    </Box>
+    <footer>
+      <div className="container">
+        <div className="footer-content">
+          <div className="footer-column">
+            <h3>NutriVue AI</h3>
+            <p>The smartest way to track your nutrition and achieve your health goals.</p>
+            <div className="social-links">
+              <a href="#"><FaFacebookF /></a>
+              <a href="#"><FaTwitter /></a>
+              <a href="#"><FaInstagram /></a>
+              <a href="#"><FaLinkedinIn /></a>
+            </div>
+          </div>
+          
+          <FooterColumn title="Product" items={footerData.product} />
+          <FooterColumn title="Company" items={footerData.company} />
+          <FooterColumn title="Contact" items={footerData.contact} />
+        </div>
+        <div className="footer-bottom">
+          <p>&copy; {new Date().getFullYear()} NutriVue AI. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
   );
 };
+
+
+
+const FooterColumn = ({ title, items }) => {
+  return (
+    <div className="footer-column">
+      <h3>{title}</h3>
+      <ul className="footer-links">
+        {items.map((item, index) => (
+          <li key={index}><a href="#">{item}</a></li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
