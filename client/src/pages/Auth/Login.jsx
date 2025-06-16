@@ -23,13 +23,14 @@ import GoogleIcon from "@mui/icons-material/Google";
 import { PasswordlessEmailForm } from "../../components/PrivateLayout/PasswordlessEmailForm";
 import { useGoogleAuth } from "../../hooks/useGoogleAuth";
 import { axiosInstance } from "../../utils/axiosInstance";
+import { GoogleButton } from "../../components/PrivateLayout/GoogleButton";
 export const Login = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { signInWithGoogle } = useGoogleAuth();
+  const { authWithGoogle } = useGoogleAuth();
 
   const handleChange = (event, newValue) => {
     setTabIndex(newValue);
@@ -65,11 +66,11 @@ export const Login = () => {
       };
 
       const response = await axiosInstance.get("/users/me",{
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-            "Content-Type": "application/json",
-          },
-        });
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "application/json",
+        },
+       });
       console.log( response.data, "==response.data");
 
       dispatch(addUser(response?.data));
@@ -118,23 +119,7 @@ export const Login = () => {
             {tabIndex === 0 && (
               <>
                 <Box>
-                  <Button
-                    startIcon={<GoogleIcon sx={{ color: "black" }} />}
-                    variant="outlined"
-                    fullWidth
-                    onClick={signInWithGoogle}
-                    sx={{
-                      mb: 2,
-                      borderColor: "black",
-                      color: "black",
-                      "&:hover": {
-                        borderColor: "black",
-                        backgroundColor: "#f0f0f0",
-                      },
-                    }}
-                  >
-                    Continue with Google
-                  </Button>
+                  <GoogleButton />
                   {/* Divider with "or" */}
                   <Divider sx={{ my: 3 }}>
                     <Typography variant="body2" sx={{ color: "gray" }}>

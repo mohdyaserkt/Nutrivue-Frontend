@@ -23,9 +23,10 @@ import { addUser } from "../../redux/slice/userSlice";
 import GoogleIcon from "@mui/icons-material/Google";
 import { PasswordlessEmailForm } from "../../components/PrivateLayout/PasswordlessEmailForm";
 import { useGoogleAuth } from "../../hooks/useGoogleAuth";
+import { GoogleButton } from "../../components/PrivateLayout/GoogleButton";
 export const Signup = () => {
   const [tabIndex, setTabIndex] = useState(0);
-  const { signInWithGoogle } = useGoogleAuth();
+  const { authWithGoogle } = useGoogleAuth();
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -125,23 +126,7 @@ export const Signup = () => {
           >
             {tabIndex === 0 && (
               <>
-                <Button
-                  startIcon={<GoogleIcon sx={{ color: "black" }} />}
-                  variant="outlined"
-                  fullWidth
-                  onClick={signInWithGoogle}
-                  sx={{
-                    mb: 1,
-                    borderColor: "black",
-                    color: "black",
-                    "&:hover": {
-                      borderColor: "black",
-                      backgroundColor: "#f0f0f0",
-                    },
-                  }}
-                >
-                  Continue with Google
-                </Button>
+               <GoogleButton/>
 
                 <Divider sx={{ my: 1 }}>
                   <Typography variant="body2" sx={{ color: "gray" }}>

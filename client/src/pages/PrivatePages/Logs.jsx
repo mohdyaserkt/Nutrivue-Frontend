@@ -126,39 +126,49 @@ export const Logs = () => {
       </TableContainer>
     );
   };
-const renderSummaryTable = (rows) => {
-  if (!Array.isArray(rows)) {
-    console.error("Expected array for summary rows:", rows);
-    return <Typography color="error">Invalid summary data.</Typography>;
-  }
+  const renderSummaryTable = (rows) => {
+    if (!Array.isArray(rows)) {
+      console.error("Expected array for summary rows:", rows);
+      return <Typography color="error">Invalid summary data.</Typography>;
+    }
 
-  return (
-    <TableContainer component={Paper}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell><strong>Date</strong></TableCell>
-            <TableCell><strong>Calories</strong></TableCell>
-            <TableCell><strong>Protein (g)</strong></TableCell>
-            <TableCell><strong>Carbs (g)</strong></TableCell>
-            <TableCell><strong>Fats (g)</strong></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <TableRow key={row.date}>
-              <TableCell>{row.date}</TableCell>
-              <TableCell>{row.total_calories?.toFixed(2) ?? "-"}</TableCell>
-              <TableCell>{row.total_protein?.toFixed(2) ?? "-"}</TableCell>
-              <TableCell>{row.total_carbs?.toFixed(2) ?? "-"}</TableCell>
-              <TableCell>{row.total_fats?.toFixed(2) ?? "-"}</TableCell>
+    return (
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>
+                <strong>Date</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Calories</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Protein (g)</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Carbs (g)</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Fats (g)</strong>
+              </TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
-};
+          </TableHead>
+          <TableBody>
+            {rows.map((row) => (
+              <TableRow key={row.date}>
+                <TableCell>{row.date}</TableCell>
+                <TableCell>{row.total_calories?.toFixed(2) ?? "-"}</TableCell>
+                <TableCell>{row.total_protein?.toFixed(2) ?? "-"}</TableCell>
+                <TableCell>{row.total_carbs?.toFixed(2) ?? "-"}</TableCell>
+                <TableCell>{row.total_fats?.toFixed(2) ?? "-"}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    );
+  };
 
   return (
     <Box sx={{ maxWidth: 1200, mx: "auto", mt: 4 }}>
@@ -235,8 +245,7 @@ const renderSummaryTable = (rows) => {
               No logs found for this period.
             </Typography>
           ) : (
-      renderSummaryTable(filteredSummaryRows)
-
+            renderSummaryTable(filteredSummaryRows)
           )}
         </AccordionDetails>
       </Accordion>

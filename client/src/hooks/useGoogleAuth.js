@@ -1,47 +1,72 @@
 import { useDispatch } from "react-redux";
-import {
-  fetchSignInMethodsForEmail,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../utils/firebase";
 import { addUser } from "../redux/slice/userSlice";
 import toast from "react-hot-toast";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { axiosInstance } from "../utils/axiosInstance";
 
 export const useGoogleAuth = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const signInWithGoogle = async () => {
+  const authWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
 
     try {
       const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      const isNewUser = result._tokenResponse?.isNewUser;
-
+      const user = result?.user;
+      if (!user) {
+        toast.error("User authentication failed. Please try again.");
+        return;
+      }
+      const isNewUser = result?._tokenResponse?.isNewUser ?? false;
+      const refreshToken = user.refreshToken;
       const idToken = await user.getIdToken();
+      console.log("result==", result);
       console.log("token==", idToken);
-      //  Store the access token
+      console.log("user==", user);
+      console.log("isNewUser==", isNewUser);
+      if (!idToken) {
+        toast.error("Unable to retrieve access token.");
+        return;
+      }
+      //  Store the access token and refresh
       localStorage.setItem("accessToken", idToken);
-      dispatch(
-        addUser({
-          uid: user.uid,
-          email: user.email,
-          name: user.displayName,
-        })
-      );
+      localStorage.setItem("refreshToken", refreshToken);
+
       if (isNewUser) {
-        await axios.post(
-          `${import.meta.env.VITE_API_BASE_URL}/users/save-user`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${idToken}`,
-            },
+        try {
+          const apiBase = import.meta.env.VITE_API_BASE_URL;
+          await axiosInstance.post(`${apiBase}/users/save-user`);
+
+          dispatch(
+            addUser({
+              uid: user.uid,
+              email: user.email,
+              name: user.displayName,
+            })
+          );
+        } catch (error) {
+          console.log(error);
+          toast.error(error.message);
+          return;
+        }
+      } else {
+        try {
+          const { data } = await axiosInstance.get("/users/me");
+          console.log(data, "==response.data");
+
+          if (data) {
+            dispatch(addUser(data));
+          } else {
+            toast.error("User data not found.");
+            return;
           }
-        );
+        } catch (error) {
+          console.error("Fetch user failed:", error);
+          toast.error("Failed to fetch user data.");
+          return;
+        }
       }
 
       navigate("/dashboard");
@@ -50,9 +75,17 @@ export const useGoogleAuth = () => {
         isNewUser ? "Google signup successful!" : "Google login successful!"
       );
     } catch (error) {
-      toast.error(error.message);
+      console.error("Google auth failed:", error);
+
+      if (error.code === "auth/popup-closed-by-user") {
+        toast.error("Login popup closed before completing sign-in.");
+      } else if (error.code === "auth/popup-blocked") {
+        toast.error("Popup was blocked by the browser. Please allow popups.");
+      } else {
+        toast.error(error?.message || "Google authentication failed.");
+      }
     }
   };
 
-  return { signInWithGoogle };
+  return { authWithGoogle };
 };
