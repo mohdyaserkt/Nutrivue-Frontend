@@ -9,6 +9,7 @@ import {
   Grid,
   TextField,
   Button,
+  MenuItem,
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import EmailIcon from "@mui/icons-material/Email";
@@ -17,25 +18,40 @@ import WcIcon from "@mui/icons-material/Wc";
 import HeightIcon from "@mui/icons-material/Height";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import { axiosInstance } from "../../utils/axiosInstance";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { updateUser } from "../../redux/slice/userSlice";
 import toast from "react-hot-toast";
+
+// Dropdown options
+const genders = ["male", "female", "other"];
+const activityLevels = ["sedentary", "light", "moderate", "active", "extra"];
+const goals = ["lose", "maintain", "gain", "custom"];
 
 export const Profile = () => {
   const [editMode, setEditMode] = useState(false);
-  const userDetails = useSelector((state) => state.user);
+  const userDetails = useSelector((state) => state?.user);
   const [user, setUser] = useState(userDetails);
-  console.log("user===", userDetails);
-
+  const dispatch = useDispatch();
   const handleChange = (field, value) => {
     setUser((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSave = async () => {
     try {
-      const response = await axiosInstance.post("/users/save-user", user);
-      console.log("Updated user:", response.data);
-      toast.success("Profile updated successfully!");
+      const payload = { ...user };
 
+      if (payload.goal === "custom") {
+        delete payload.target_calories;
+      } else {
+        // Only send target_calories
+        delete payload.customCalorie;
+        delete payload.target_calories;
+      }
+      const { data } = await axiosInstance.post("/users/save-user", payload);
+      console.log("data====", data);
+      dispatch(updateUser(data));
+      setUser(data);
+      toast.success("Profile updated successfully!");
       setEditMode(false);
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -89,6 +105,7 @@ export const Profile = () => {
               label="Gender"
               value={user.gender}
               editable={editMode}
+              options={genders}
               onChange={(v) => handleChange("gender", v)}
             />
             <ProfileField
@@ -96,20 +113,21 @@ export const Profile = () => {
               label="Weight"
               value={user.weight_kg}
               editable={editMode}
-              onChange={(v) => handleChange("weight", v)}
+              onChange={(v) => handleChange("weight_kg", v)}
             />
             <ProfileField
               icon={<HeightIcon />}
               label="Height"
               value={user.height_cm}
               editable={editMode}
-              onChange={(v) => handleChange("height", v)}
+              onChange={(v) => handleChange("height_cm", v)}
             />
             <ProfileField
               icon={<HeightIcon />}
-              label="ActivityLevel"
+              label="Activity Level"
               value={user.activity_level}
               editable={editMode}
+              options={activityLevels}
               onChange={(v) => handleChange("activity_level", v)}
             />
             <ProfileField
@@ -117,15 +135,26 @@ export const Profile = () => {
               label="Goal"
               value={user.goal}
               editable={editMode}
+              options={goals}
               onChange={(v) => handleChange("goal", v)}
             />
-            <ProfileField
-              icon={<HeightIcon />}
-              label="TargetCalorie"
-              value={user?.target_calories}
-              editable={editMode}
-              onChange={(v) => handleChange("Target_calories", v)}
-            />
+            {user.goal === "custom" ? (
+              <ProfileField
+                icon={<HeightIcon />}
+                label="Target Calorie"
+                value={user.customCalorie}
+                editable={editMode}
+                onChange={(v) => handleChange("customCalorie", v)}
+              />
+            ) : (
+              <ProfileField
+                icon={<HeightIcon />}
+                label="Target Calorie"
+                value={user.target_calories}
+                editable={editMode}
+                onChange={(v) => handleChange("target_calories", v)}
+              />
+            )}
           </Grid>
 
           <Box sx={{ mt: 3, display: "flex", justifyContent: "flex-end" }}>
@@ -134,7 +163,10 @@ export const Profile = () => {
                 <Button
                   variant="outlined"
                   sx={{ mr: 2 }}
-                  onClick={() => setEditMode(false)}
+                  onClick={() => {
+                    setUser(userDetails);
+                    setEditMode(false);
+                  }}
                 >
                   Cancel
                 </Button>
@@ -154,7 +186,15 @@ export const Profile = () => {
   );
 };
 
-const ProfileField = ({ icon, label, value, editable = false, onChange }) => (
+// Reusable field component with dropdown support
+const ProfileField = ({
+  icon,
+  label,
+  value,
+  editable = false,
+  onChange,
+  options = [],
+}) => (
   <Grid item xs={12} sm={6}>
     <Box
       sx={{
@@ -171,12 +211,29 @@ const ProfileField = ({ icon, label, value, editable = false, onChange }) => (
           {label}
         </Typography>
         {editable ? (
-          <TextField
-            variant="standard"
-            fullWidth
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-          />
+          options.length > 0 ? (
+            <TextField
+              select
+              variant="standard"
+              fullWidth
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+            >
+              {options.map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </TextField>
+          ) : (
+            <TextField
+              variant="standard"
+              fullWidth
+              type={typeof value === "number" ? "number" : "text"}
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+            />
+          )
         ) : (
           <Typography variant="body1" fontWeight={500}>
             {value}

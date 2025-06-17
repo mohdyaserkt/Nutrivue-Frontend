@@ -87,10 +87,10 @@ export const DetailsModal = ({ open, onClose, userData }) => {
     if (!validate()) return;
 
     try {
-      const response = await axiosInstance.post("/users/save-user", formData);
-      console.log("response==", response);
+      const { data } = await axiosInstance.post("/users/save-user", formData);
+      console.log("response==", data);
       toast.success("updated successful");
-      dispatch(updateUser(formData));
+      dispatch(updateUser(data));
       onClose();
     } catch (error) {
       toast.error(error.message || error);

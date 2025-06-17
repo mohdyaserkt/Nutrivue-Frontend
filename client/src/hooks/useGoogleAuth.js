@@ -36,9 +36,6 @@ export const useGoogleAuth = () => {
 
       if (isNewUser) {
         try {
-          const apiBase = import.meta.env.VITE_API_BASE_URL;
-          await axiosInstance.post(`${apiBase}/users/save-user`);
-
           dispatch(
             addUser({
               uid: user.uid,
@@ -58,14 +55,22 @@ export const useGoogleAuth = () => {
 
           if (data) {
             dispatch(addUser(data));
-          } else {
-            toast.error("User data not found.");
-            return;
           }
         } catch (error) {
-          console.error("Fetch user failed:", error);
-          toast.error("Failed to fetch user data.");
-          return;
+          if (error.response.status === 404) {
+            dispatch(
+              addUser({
+                uid: user.uid,
+                email: user.email,
+                name: user.displayName,
+              })
+            );
+          } else {
+            console.error("Fetch user failed:", error);
+            console.error("status", error.response.status);
+            toast.error("Failed to fetch user data.");
+            return;
+          }
         }
       }
 
