@@ -9,6 +9,8 @@ import {
   Tabs,
   Tab,
   Divider,
+  MenuItem,
+  Grid,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import {
@@ -22,17 +24,23 @@ import { useDispatch } from "react-redux";
 import { addUser } from "../../redux/slice/userSlice";
 import GoogleIcon from "@mui/icons-material/Google";
 import { PasswordlessEmailForm } from "../../components/PrivateLayout/PasswordlessEmailForm";
-import { useGoogleAuth } from "../../hooks/useGoogleAuth";
 import { GoogleButton } from "../../components/PrivateLayout/GoogleButton";
 export const Signup = () => {
   const [tabIndex, setTabIndex] = useState(0);
-  const { authWithGoogle } = useGoogleAuth();
   const [form, setForm] = useState({
-    username: "",
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
+    age: "",
+    gender: "",
+    weight_kg: "",
+    height_cm: "",
+    activity_level: "",
+    goal: "",
+    customCalorie: "",
   });
+
   const dispatch = useDispatch();
   const handleChange = (e) => {
     setForm((prev) => ({
@@ -48,16 +56,6 @@ export const Signup = () => {
       return;
     }
     try {
-      const methods = fetchSignInMethodsForEmail(auth, form?.email).then(
-        (data) => console.log("🔥 data after refresh:", data)
-      );
-
-      // if (methods.includes("google.com") && !methods.includes("password")) {
-      //   toast.error(
-      //     "This email is already registered via Google. You can’t sign up with a password."
-      //   );
-      //   return;
-      // }
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         form.email,
@@ -67,9 +65,19 @@ export const Signup = () => {
       const firebaseUser = userCredential.user;
       const idToken = await firebaseUser.getIdToken();
 
-      await axios.post(
+      const { data } = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/users/save-user`,
-        {},
+        {
+          name: form.username,
+          email: form.email,
+          age: form.age,
+          gender: form.gender,
+          weight_kg: form.weight_kg,
+          height_cm: form.height_cm,
+          activity_level: form.activity_level,
+          goal: form.goal,
+          ...(form.goal === "custom" && { customCalorie: form.customCalorie }),
+        },
         {
           headers: {
             Authorization: `Bearer ${idToken}`,
@@ -77,6 +85,7 @@ export const Signup = () => {
           },
         }
       );
+      console.log("data====", data);
       localStorage.setItem("accessToken", idToken);
       const userData = {
         uid: firebaseUser.uid,
@@ -107,7 +116,7 @@ export const Signup = () => {
       }}
     >
       <Container maxWidth="sm">
-        <Paper elevation={3} sx={{ p: 4 }}>
+        <Paper elevation={3} sx={{ p: 4, maxWidth: "1200px", mx: "auto" }}>
           <Tabs
             value={tabIndex}
             onChange={(e, newValue) => setTabIndex(newValue)}
@@ -126,7 +135,7 @@ export const Signup = () => {
           >
             {tabIndex === 0 && (
               <>
-               <GoogleButton/>
+                <GoogleButton />
 
                 <Divider sx={{ my: 1 }}>
                   <Typography variant="body2" sx={{ color: "gray" }}>
@@ -138,55 +147,170 @@ export const Signup = () => {
                   Create Your Account
                 </Typography>
                 <form onSubmit={handleSubmit}>
-                  <TextField
-                    label="Username"
-                    name="username"
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    required
-                    value={form.username}
-                    onChange={handleChange}
-                  />
-                  <TextField
-                    label="Email"
-                    name="email"
-                    type="email"
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    required
-                    value={form.email}
-                    onChange={handleChange}
-                  />
-                  <TextField
-                    label="Password"
-                    name="password"
-                    type="password"
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    required
-                    value={form.password}
-                    onChange={handleChange}
-                  />
-                  <TextField
-                    label="Confirm Password"
-                    name="confirmPassword"
-                    type="password"
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    required
-                    value={form.confirmPassword}
-                    onChange={handleChange}
-                  />
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        label="Username"
+                        name="username"
+                        fullWidth
+                        required
+                        value={form.username}
+                        onChange={handleChange}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        label="Email"
+                        name="email"
+                        type="email"
+                        fullWidth
+                        required
+                        value={form.email}
+                        onChange={handleChange}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        label="Password"
+                        name="password"
+                        type="password"
+                        fullWidth
+                        required
+                        value={form.password}
+                        onChange={handleChange}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        label="Confirm Password"
+                        name="confirmPassword"
+                        type="password"
+                        fullWidth
+                        required
+                        value={form.confirmPassword}
+                        onChange={handleChange}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        label="Age"
+                        name="age"
+                        fullWidth
+                        required
+                        value={form.age}
+                        onChange={handleChange}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        select
+                        label="Gender"
+                        name="gender"
+                        fullWidth
+                        required
+                        value={form.gender}
+                        onChange={handleChange}
+                      >
+                        {["male", "female", "other"].map((option) => (
+                          <MenuItem key={option} value={option}>
+                            {option}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        label="Weight (kg)"
+                        name="weight_kg"
+                        type="number"
+                        fullWidth
+                        required
+                        value={form.weight_kg}
+                        onChange={handleChange}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        label="Height (cm)"
+                        name="height_cm"
+                        type="number"
+                        fullWidth
+                        required
+                        value={form.height_cm}
+                        onChange={handleChange}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        select
+                        label="Activity Level"
+                        name="activity_level"
+                        fullWidth
+                        required
+                        value={form.activity_level}
+                        onChange={handleChange}
+                      >
+                        {[
+                          "sedentary",
+                          "light",
+                          "moderate",
+                          "active",
+                          "extra",
+                        ].map((level) => (
+                          <MenuItem key={level} value={level}>
+                            {level}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        select
+                        label="Goal"
+                        name="goal"
+                        fullWidth
+                        required
+                        value={form.goal}
+                        onChange={handleChange}
+                      >
+                        {["lose", "maintain", "gain", "custom"].map((goal) => (
+                          <MenuItem key={goal} value={goal}>
+                            {goal}
+                          </MenuItem>
+                        ))}
+                      </TextField>
+                    </Grid>
+
+                    {form.goal === "custom" && (
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          label="Custom Calorie"
+                          name="customCalorie"
+                          type="number"
+                          fullWidth
+                          required
+                          value={form.customCalorie}
+                          onChange={handleChange}
+                        />
+                      </Grid>
+                    )}
+                  </Grid>
+
                   <Button
                     type="submit"
                     variant="contained"
                     fullWidth
                     sx={{
-                      mt: 2,
+                      mt: 3,
                       backgroundColor: "black",
                       color: "white",
                       "&:hover": {

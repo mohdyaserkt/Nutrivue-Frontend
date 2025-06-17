@@ -40,15 +40,6 @@ export const Login = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const methods = await fetchSignInMethodsForEmail(auth, email);
-      console.log("methods==", methods);
-      if (methods.includes("google.com") && !methods.includes("password")) {
-        toast.error(
-          "This email is registered via Google. Please use Google Login."
-        );
-        return;
-      }
-
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
@@ -57,23 +48,33 @@ export const Login = () => {
 
       const firebaseUser = userCredential.user;
       const idToken = await firebaseUser.getIdToken();
-
+      console.log("firebaseuser===", firebaseUser);
       console.log("idToken==", idToken);
       localStorage.setItem("accessToken", idToken);
       const userData = {
         uid: firebaseUser.uid,
         email: firebaseUser.email,
       };
+      try {
+        const response = await axiosInstance.get("/users/me", {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+            "Content-Type": "application/json",
+          },
+        });
+        console.log(response.data, "==response.data");
 
-      const response = await axiosInstance.get("/users/me",{
-        headers: {
-          Authorization: `Bearer ${idToken}`,
-          "Content-Type": "application/json",
-        },
-       });
-      console.log( response.data, "==response.data");
+        dispatch(addUser(response?.data));
+      } catch (error) {
+        if (error.response.status === 404) {
+          dispatch(addUser(userData));
+        }
+        console.error("Fetch user failed:", error);
+        console.error("status", error.response.status);
+        toast.error("Failed to fetch user data.");
+        return;
+      }
 
-      dispatch(addUser(response?.data));
       navigate("/dashboard");
       toast.success("Login successful!");
     } catch (err) {
