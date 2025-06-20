@@ -10,7 +10,9 @@ export const MainLayout = () => {
      <div className="bg-blur-1"></div>
       <div className="bg-blur-2"></div>
       <Header />
+      <div style={{ paddingTop: '120px' }}>
       <Outlet />
+    </div>
       <Footer />
     </>
   )

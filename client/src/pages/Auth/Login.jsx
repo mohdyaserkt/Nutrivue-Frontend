@@ -1,42 +1,21 @@
 import { useState } from "react";
-import {
-  Box,
-  Container,
-  TextField,
-  Button,
-  Typography,
-  Paper,
-  Tabs,
-  Tab,
-  Divider,
-} from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import {
-  fetchSignInMethodsForEmail,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../utils/firebase";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { addUser } from "../../redux/slice/userSlice";
-import GoogleIcon from "@mui/icons-material/Google";
 import { PasswordlessEmailForm } from "../../components/PrivateLayout/PasswordlessEmailForm";
-import { useGoogleAuth } from "../../hooks/useGoogleAuth";
 import { axiosInstance } from "../../utils/axiosInstance";
 import { GoogleButton } from "../../components/PrivateLayout/GoogleButton";
+import { SubmitButton } from "../../components/PublicLayout/SubmitButton";
 export const Login = () => {
-  const [tabIndex, setTabIndex] = useState(0);
+   const [showMagicLink, setShowMagicLink] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { authWithGoogle } = useGoogleAuth();
 
-  const handleChange = (event, newValue) => {
-    setTabIndex(newValue);
-    setEmail("");
-    setPassword("");
-  };
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
@@ -90,102 +69,97 @@ export const Login = () => {
   };
 
   return (
-    <Box
-      sx={{
-        backgroundColor: "#f5f5f5",
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        py: 6,
-        px: 2,
-      }}
-    >
-      <Container maxWidth="sm">
-        <Paper elevation={3} sx={{ p: 4 }}>
-          <Tabs value={tabIndex} onChange={handleChange} centered>
-            <Tab label="Email & Password" />
-            <Tab label="Magic Link" />
-          </Tabs>
+   <div className="auth-container">
+      <div className="bg-blur-1"></div>
+      <div className="bg-blur-2"></div>
+      <div className="glass-card auth-card">
+        {/* Logo */}
+        <div className="auth-logo">
+          <img
+            src="https://res.cloudinary.com/daz1e04fq/image/upload/v1750063589/Nutrivue/u37dajzrvjsrh8o17tku.svg"
+            alt="NutriVue AI"
+          />
+        </div>
 
-          <Box
-            sx={{
-              minHeight: { xs: "400px", sm: "450px" },
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              mt: 2,
-            }}
-          >
-            {tabIndex === 0 && (
-              <>
-                <Box>
-                  <GoogleButton />
-                  {/* Divider with "or" */}
-                  <Divider sx={{ my: 3 }}>
-                    <Typography variant="body2" sx={{ color: "gray" }}>
-                      or
-                    </Typography>
-                  </Divider>
-                  <Typography variant="h5" fontWeight={600} gutterBottom>
-                    Login to Nutrivue
-                  </Typography>
-                  <form onSubmit={handleSubmit}>
-                    <TextField
-                      label="Email"
-                      variant="outlined"
-                      fullWidth
-                      margin="normal"
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                    <TextField
-                      label="Password"
-                      variant="outlined"
-                      fullWidth
-                      margin="normal"
-                      type="password"
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      fullWidth
-                      sx={{
-                        mt: 2,
-                        backgroundColor: "black",
-                        color: "white",
-                        "&:hover": {
-                          backgroundColor: "#333",
-                        },
-                      }}
-                    >
-                      Sign In
-                    </Button>
-                  </form>
-                </Box>
-              </>
-            )}
+        {/* Tabs */}
+        <div className="auth-tabs">
+          <a className="active">Login</a>
+          <a onClick={() => navigate("/register")}>Sign Up</a>
+        </div>
 
-            {tabIndex === 1 && (
-              <PasswordlessEmailForm title="Login with Email Link" />
-            )}
+        {/* Google login */}
+        <div className="social-login">
+          <GoogleButton />
+        </div>
 
-            <Typography
-              variant="body2"
-              align="center"
-              sx={{ mt: 3, cursor: "pointer", color: "black" }}
-              onClick={() => navigate("/register")}
-            >
-              Don&apos;t have an account? Sign Up
-            </Typography>
-          </Box>
-        </Paper>
-      </Container>
-    </Box>
+        <div className="divider">
+          <span>or</span>
+        </div>
+
+        {!showMagicLink ? (
+          <>
+            <form className="auth-form" onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label>Email Address</label>
+                <div className="input-with-icon">
+                  <i className="fas fa-envelope"></i>
+                  <input
+                    name="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Password</label>
+                <div className="input-with-icon">
+                  <i className="fas fa-lock"></i>
+                  <input
+                    name="password"
+                    type="password"
+                    placeholder="Enter your password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <i className="fas fa-eye toggle-password"></i>
+                </div>
+              </div>
+
+             <SubmitButton  type={`submit`} text={`SignIn`}/>
+            </form>
+
+            {/* Magic link toggle */}
+            <div className="magic-link">
+              <p>
+                Prefer passwordless?{" "}
+                <a onClick={() => setShowMagicLink(true)}>Login with Magic Link</a>
+              </p>
+            </div>
+          </>
+        ) : (
+          <>
+            <PasswordlessEmailForm title="Login with Magic Link" />
+
+            <div className="magic-link">
+              <p>
+                Go back to{" "}
+                <a onClick={() => setShowMagicLink(false)}>Email & Password Login</a>
+              </p>
+            </div>
+          </>
+        )}
+
+        {/* Footer */}
+        <div className="auth-footer">
+          Don't have an account?{" "}
+          <a onClick={() => navigate("/register")}>Sign Up</a>
+        </div>
+      </div>
+    </div>
   );
 };

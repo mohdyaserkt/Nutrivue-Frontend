@@ -1,32 +1,20 @@
 import { useState } from "react";
-import {
-  Box,
-  Container,
-  TextField,
-  Button,
-  Typography,
-  Paper,
-  Tabs,
-  Tab,
-  Divider,
-  MenuItem,
-  Grid,
-} from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import {
-  createUserWithEmailAndPassword,
-  fetchSignInMethodsForEmail,
-} from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../utils/firebase";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { addUser } from "../../redux/slice/userSlice";
-import GoogleIcon from "@mui/icons-material/Google";
-import { PasswordlessEmailForm } from "../../components/PrivateLayout/PasswordlessEmailForm";
 import { GoogleButton } from "../../components/PrivateLayout/GoogleButton";
+import "./auth.css";
+import { SubmitButton } from "../../components/PublicLayout/SubmitButton";
 export const Signup = () => {
-  const [tabIndex, setTabIndex] = useState(0);
+  const [showPassword, setShowPassword] = useState(false);
+  const toggleShowPassword = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -104,241 +92,221 @@ export const Signup = () => {
   };
 
   return (
-    <Box
-      sx={{
-        backgroundColor: "#f5f5f5",
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        py: 6,
-        px: 2,
-      }}
-    >
-      <Container maxWidth="sm">
-        <Paper elevation={3} sx={{ p: 4, maxWidth: "1200px", mx: "auto" }}>
-          <Tabs
-            value={tabIndex}
-            onChange={(e, newValue) => setTabIndex(newValue)}
-            centered
-          >
-            <Tab label="Standard Sign Up" />
-            <Tab label="Passwordless Sign Up" />
-          </Tabs>
+    <div className="auth-container">
+      <div className="bg-blur-1"></div>
+      <div className="bg-blur-2"></div>
+      <div className="glass-card auth-card">
+        <div className="auth-logo">
+          <img
+            src="https://res.cloudinary.com/daz1e04fq/image/upload/v1750063589/Nutrivue/u37dajzrvjsrh8o17tku.svg"
+            alt="NutriVue AI"
+          />
+        </div>
 
-          <Box
-            sx={{
-              mt: 4,
-              minHeight: "480px",
-              transition: "min-height 0.3s ease",
-            }}
-          >
-            {tabIndex === 0 && (
-              <>
-                <GoogleButton />
+        <div className="auth-tabs">
+          <a onClick={() => navigate("/login")}>Login</a>
+          <a className="active">Sign Up</a>
+        </div>
 
-                <Divider sx={{ my: 1 }}>
-                  <Typography variant="body2" sx={{ color: "gray" }}>
-                    or
-                  </Typography>
-                </Divider>
+        <div className="social-login">
+          <GoogleButton />
+        </div>
 
-                <Typography variant="h5" fontWeight={600} gutterBottom>
-                  Create Your Account
-                </Typography>
-                <form onSubmit={handleSubmit}>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        label="Username"
-                        name="username"
-                        fullWidth
-                        required
-                        value={form.username}
-                        onChange={handleChange}
-                      />
-                    </Grid>
+        <div className="divider">
+          <span>or</span>
+        </div>
 
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        label="Email"
-                        name="email"
-                        type="email"
-                        fullWidth
-                        required
-                        value={form.email}
-                        onChange={handleChange}
-                      />
-                    </Grid>
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Full Name</label>
+            <div className="input-with-icon">
+              <i className="fas fa-user"></i>
+              <input
+                name="username"
+                type="text"
+                placeholder="Enter your full name"
+                required
+                value={form.username}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
 
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        label="Password"
-                        name="password"
-                        type="password"
-                        fullWidth
-                        required
-                        value={form.password}
-                        onChange={handleChange}
-                      />
-                    </Grid>
+          <div className="form-group">
+            <label>Email Address</label>
+            <div className="input-with-icon">
+              <i className="fas fa-envelope"></i>
+              <input
+                name="email"
+                type="email"
+                placeholder="Enter your email"
+                required
+                value={form.email}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
 
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        label="Confirm Password"
-                        name="confirmPassword"
-                        type="password"
-                        fullWidth
-                        required
-                        value={form.confirmPassword}
-                        onChange={handleChange}
-                      />
-                    </Grid>
+          <div className="form-group">
+            <label>Create Password</label>
+            <div className="input-with-icon">
+              <i className="fas fa-lock"></i>
+              <input
+                name="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Create a password"
+                required
+                value={form.password}
+                onChange={handleChange}
+              />
+              <i
+                className={`fas ${
+                  showPassword ? "fa-eye-slash" : "fa-eye"
+                } toggle-password`}
+                onClick={toggleShowPassword}
+                style={{ cursor: "pointer" }}
+              ></i>
+            </div>
+          </div>
 
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        label="Age"
-                        name="age"
-                        fullWidth
-                        required
-                        value={form.age}
-                        onChange={handleChange}
-                      />
-                    </Grid>
+          <div className="form-group">
+            <label>Age</label>
+            <div className="input-with-icon">
+              <i className="fas fa-hourglass-half"></i>
+              <input
+                name="age"
+                type="number"
+                placeholder="Enter your age"
+                required
+                value={form.age}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
 
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        select
-                        label="Gender"
-                        name="gender"
-                        fullWidth
-                        required
-                        value={form.gender}
-                        onChange={handleChange}
-                      >
-                        {["male", "female", "other"].map((option) => (
-                          <MenuItem key={option} value={option}>
-                            {option}
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    </Grid>
+          <div className="form-group">
+            <label>Gender</label>
+            <div className="input-with-icon">
+              <i className="fas fa-venus-mars"></i>
+              <select
+                name="gender"
+                required
+                value={form.gender}
+                onChange={handleChange}
+                style={{ paddingLeft: "45px" }}
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
 
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        label="Weight (kg)"
-                        name="weight_kg"
-                        type="number"
-                        fullWidth
-                        required
-                        value={form.weight_kg}
-                        onChange={handleChange}
-                      />
-                    </Grid>
+          <div className="form-group">
+            <label>Weight (kg)</label>
+            <div className="input-with-icon">
+              <i className="fas fa-weight"></i>
+              <input
+                name="weight_kg"
+                type="number"
+                placeholder="e.g. 70"
+                required
+                value={form.weight_kg}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
 
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        label="Height (cm)"
-                        name="height_cm"
-                        type="number"
-                        fullWidth
-                        required
-                        value={form.height_cm}
-                        onChange={handleChange}
-                      />
-                    </Grid>
+          <div className="form-group">
+            <label>Height (cm)</label>
+            <div className="input-with-icon">
+              <i className="fas fa-ruler-vertical"></i>
+              <input
+                name="height_cm"
+                type="number"
+                placeholder="e.g. 170"
+                required
+                value={form.height_cm}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
 
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        select
-                        label="Activity Level"
-                        name="activity_level"
-                        fullWidth
-                        required
-                        value={form.activity_level}
-                        onChange={handleChange}
-                      >
-                        {[
-                          "sedentary",
-                          "light",
-                          "moderate",
-                          "active",
-                          "extra",
-                        ].map((level) => (
-                          <MenuItem key={level} value={level}>
-                            {level}
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    </Grid>
+          <div className="form-group">
+            <label>Activity Level</label>
+            <div className="input-with-icon">
+              <i className="fas fa-running"></i>
+              <select
+                name="activity_level"
+                required
+                value={form.activity_level}
+                onChange={handleChange}
+                style={{ paddingLeft: "45px" }}
+              >
+                <option value="">Select Activity Level</option>
+                <option value="sedentary">Sedentary</option>
+                <option value="light">Light</option>
+                <option value="moderate">Moderate</option>
+                <option value="active">Active</option>
+                <option value="extra">Extra</option>
+              </select>
+            </div>
+          </div>
 
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        select
-                        label="Goal"
-                        name="goal"
-                        fullWidth
-                        required
-                        value={form.goal}
-                        onChange={handleChange}
-                      >
-                        {["lose", "maintain", "gain", "custom"].map((goal) => (
-                          <MenuItem key={goal} value={goal}>
-                            {goal}
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    </Grid>
+          <div className="form-group">
+            <label>Goal</label>
+            <div className="input-with-icon">
+              <i className="fas fa-bullseye"></i>
+              <select
+                name="goal"
+                required
+                value={form.goal}
+                onChange={handleChange}
+                style={{ paddingLeft: "45px" }}
+              >
+                <option value="">Select Goal</option>
+                <option value="lose">Lose</option>
+                <option value="maintain">Maintain</option>
+                <option value="gain">Gain</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
+          </div>
 
-                    {form.goal === "custom" && (
-                      <Grid item xs={12} sm={6}>
-                        <TextField
-                          label="Custom Calorie"
-                          name="customCalorie"
-                          type="number"
-                          fullWidth
-                          required
-                          value={form.customCalorie}
-                          onChange={handleChange}
-                        />
-                      </Grid>
-                    )}
-                  </Grid>
+          {form.goal === "custom" && (
+            <div className="form-group">
+              <label>Custom Calorie</label>
+              <div className="input-with-icon">
+                <i className="fas fa-fire"></i>
+                <input
+                  name="customCalorie"
+                  type="number"
+                  placeholder="e.g. 2500"
+                  required
+                  value={form.customCalorie}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+          )}
 
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    fullWidth
-                    sx={{
-                      mt: 3,
-                      backgroundColor: "black",
-                      color: "white",
-                      "&:hover": {
-                        backgroundColor: "#333",
-                      },
-                    }}
-                  >
-                    Sign Up
-                  </Button>
-                </form>
-              </>
-            )}
+          <div className="form-group terms">
+            <input type="checkbox" id="terms" required />
+            <label htmlFor="terms">
+              I agree to the <a href="#">Terms of Service</a> and{" "}
+              <a href="#">Privacy Policy</a>
+            </label>
+          </div>
 
-            {tabIndex === 1 && (
-              <PasswordlessEmailForm title="Sign Up with Magic Link" />
-            )}
+          <SubmitButton type={`submit`} text={`Signup`} />
+        </form>
 
-            <Typography
-              variant="body2"
-              align="center"
-              sx={{ mt: 4, cursor: "pointer", color: "black" }}
-              onClick={() => navigate("/login")}
-            >
-              Already have an account? Sign In
-            </Typography>
-          </Box>
-        </Paper>
-      </Container>
-    </Box>
+        <div className="auth-footer">
+          Already have an account?{" "}
+          <a onClick={() => navigate("/login")}>Login</a>
+        </div>
+      </div>
+    </div>
   );
 };
