@@ -39,10 +39,7 @@ export const Signup = () => {
   const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (form.password !== form.confirmPassword) {
-      toast("Passwords do not match");
-      return;
-    }
+ 
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -56,7 +53,7 @@ export const Signup = () => {
       const { data } = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/users/save-user`,
         {
-          name: form.username,
+          name: form.name,
           email: form.email,
           age: form.age,
           gender: form.gender,
@@ -122,11 +119,11 @@ export const Signup = () => {
             <div className="input-with-icon">
               <i className="fas fa-user"></i>
               <input
-                name="username"
+                name="name"
                 type="text"
                 placeholder="Enter your full name"
                 required
-                value={form.username}
+                value={form.name}
                 onChange={handleChange}
               />
             </div>
