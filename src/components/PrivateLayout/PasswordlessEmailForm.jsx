@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { TextField, Button, Typography } from "@mui/material";
 import { sendSignInLinkToEmail } from "firebase/auth";
 import { auth } from "../../utils/firebase";
 import toast from "react-hot-toast";
+import { SubmitButton } from "../PublicLayout/SubmitButton";
 
 export const PasswordlessEmailForm = ({ title = "Continue with Email" }) => {
   const [email, setEmail] = useState("");
@@ -23,35 +23,27 @@ export const PasswordlessEmailForm = ({ title = "Continue with Email" }) => {
   };
   return (
     <>
-      <Typography variant="h5" fontWeight={600} gutterBottom>
+      <h2 style={{ marginBottom: "20px", fontWeight: "600", fontSize: "20px" }}>
         {title}
-      </Typography>
-      <form onSubmit={handleMagicLinkLogin}>
-        <TextField
-          label="Email"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <Button
-          type="submit"
-          variant="contained"
-          fullWidth
-          sx={{
-            mt: 2,
-            backgroundColor: "black",
-            color: "white",
-            "&:hover": {
-              backgroundColor: "#333",
-            },
-          }}
-        >
-          Send Magic Link
-        </Button>
+      </h2>
+
+      <form className="auth-form" onSubmit={handleMagicLinkLogin}>
+        <div className="form-group">
+          <label>Email Address</label>
+          <div className="input-with-icon">
+            <i className="fas fa-envelope"></i>
+            <input
+              name="email"
+              type="email"
+              placeholder="Enter your email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <SubmitButton type={`submit`} text={`Send Magic Link`} />
       </form>
     </>
   );
