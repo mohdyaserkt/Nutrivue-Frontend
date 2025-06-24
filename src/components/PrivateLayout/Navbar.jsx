@@ -10,17 +10,12 @@ import {
   MenuItem,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { clearUser } from "../../redux/slice/userSlice";
-import { signOut } from "firebase/auth";
-import { auth } from "../../utils/firebase";
-import toast from "react-hot-toast";
-import { axiosInstance } from "../../utils/axiosInstance";
+import { useLogout } from "../../hooks/useLogout";
 export const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const { handleLogout } = useLogout();
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -28,14 +23,10 @@ export const Navbar = () => {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-  const handleLogout = async () => {
+  const onLogoutClick = async () => {
     try {
-      await signOut(auth); // Firebase logout
+      await handleLogout();
       handleMenuClose();
-      localStorage.removeItem("accessToken");
-      dispatch(clearUser());
-      toast("Logout Successfully");
-      navigate("/login");
     } catch (error) {
       console.error("Logout error:", error);
     }
@@ -45,7 +36,7 @@ export const Navbar = () => {
     navigate("/profile");
   };
   const handleLogsClick = () => {
-    handleMenuClose()
+    handleMenuClose();
     navigate("/logs");
   };
   return (
@@ -73,7 +64,7 @@ export const Navbar = () => {
           >
             <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
             <MenuItem onClick={handleLogsClick}>Logs</MenuItem>
-            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+            <MenuItem onClick={onLogoutClick}>Logout</MenuItem>
           </Menu>
         </Box>
       </Toolbar>
