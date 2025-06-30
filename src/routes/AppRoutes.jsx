@@ -10,6 +10,7 @@ import { Profile } from "../pages/PrivatePages/Profile";
 import { NotFound } from "../pages/NotFound";
 import { VerifyPage } from "../pages/Auth/VerifyPage";
 import { Logs } from "../pages/PrivatePages/Logs";
+import NewDashboard from "../pages/Dashboard/Dashboard";
 
 function AppRoutes() {
   return (
@@ -17,6 +18,7 @@ function AppRoutes() {
       <Route element={<MainLayout />}>
         {/* Public Routes with shared MainLayout */}
         <Route path="/" element={<Home />} />
+       
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Signup />} />
         <Route path="/verify" element={<VerifyPage />} />
@@ -25,7 +27,8 @@ function AppRoutes() {
       {/* Protected Routes with DashboardLayout */}
       <Route element={<PrivateRoutes />}>
         <Route element={<PrivateLayout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<NewDashboard />} />
+           <Route path="/chk" element={<Dashboard />} />
           <Route path="/logs" element={<Logs />} />
           <Route path="/profile" element={<Profile />} />
         </Route>
