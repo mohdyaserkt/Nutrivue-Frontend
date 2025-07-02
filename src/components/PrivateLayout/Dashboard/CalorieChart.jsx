@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { axiosInstance } from "../../../utils/axiosInstance";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -23,7 +24,7 @@ export const CalorieChart = ({ isSubmitted }) => {
   const targetCalories = userDetails?.target_calories || 6000;
 
   const [calorieData, setCalorieData] = useState({});
-
+  const navigate=useNavigate()
   const fetchTodaysCalorie = async () => {
     try {
       const { data } = await axiosInstance.get(`/food/log/daily/${today}`);
@@ -74,6 +75,7 @@ export const CalorieChart = ({ isSubmitted }) => {
 
   return (
     <Box width="100%" p={2}>
+      <h1 onClick={()=>navigate("/chk")}> chk redirect</h1>
       <Paper
         sx={{
           p: 4,
