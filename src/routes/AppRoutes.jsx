@@ -11,31 +11,35 @@ import { NotFound } from "../pages/NotFound";
 import { VerifyPage } from "../pages/Auth/VerifyPage";
 import { Logs } from "../pages/PrivatePages/Logs";
 import NewDashboard from "../pages/Dashboard/Dashboard";
+import { AuthWatcher } from "../utils/AuthWatcher";
 
 function AppRoutes() {
   return (
-    <Routes>
-      <Route element={<MainLayout />}>
-        {/* Public Routes with shared MainLayout */}
-        <Route path="/" element={<Home />} />
-       
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Signup />} />
-        <Route path="/verify" element={<VerifyPage />} />
-      </Route>
+    <>
+      <AuthWatcher />
+      <Routes>
+        <Route element={<MainLayout />}>
+          {/* Public Routes with shared MainLayout */}
+          <Route path="/" element={<Home />} />
 
-      {/* Protected Routes with DashboardLayout */}
-      <Route element={<PrivateRoutes />}>
-        <Route element={<PrivateLayout />}>
-          <Route path="/dashboard" element={<NewDashboard />} />
-           <Route path="/chk" element={<Dashboard />} />
-          <Route path="/logs" element={<Logs />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Signup />} />
+          <Route path="/verify" element={<VerifyPage />} />
         </Route>
-      </Route>
-      {/* 404 Fallback */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+
+        {/* Protected Routes with DashboardLayout */}
+        <Route element={<PrivateRoutes />}>
+          <Route element={<PrivateLayout />}>
+            <Route path="/dashboard" element={<NewDashboard />} />
+            <Route path="/chk" element={<Dashboard />} />
+            <Route path="/logs" element={<Logs />} />
+            <Route path="/profile" element={<Profile />} />
+          </Route>
+        </Route>
+        {/* 404 Fallback */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
   );
 }
 

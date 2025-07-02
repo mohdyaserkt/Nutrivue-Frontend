@@ -6,7 +6,7 @@ import { axiosInstance } from '../../../../utils/axiosInstance'
 
 
 function DailyLog({logNotifier, OpenDailyLogModal,setslectedDate}) {
-  const userDetails = useSelector((state) => state?.user)
+  const userDetails = useSelector((state) => state?.user?.user)
   const targetCalorie = userDetails?.target_calories || 0.0
   const [currentDate, setCurrentDate] = useState(new Date())
   const [filteredLogs, setFilteredLogs] = useState({})

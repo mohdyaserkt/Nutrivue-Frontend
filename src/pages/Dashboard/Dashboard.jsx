@@ -29,7 +29,7 @@ function NewDashboard() {
   const [showCompleteProfileModal, setShowCompleteProfileModal] =
     useState(false);
 
-  const user = useSelector((state) => state?.user);
+  const user = useSelector((state) => state?.user?.user);
   useEffect(() => {
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach((anchor) => {

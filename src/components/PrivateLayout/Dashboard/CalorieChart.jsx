@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 export const CalorieChart = ({ isSubmitted }) => {
-  const userDetails = useSelector((state) => state?.user);
+  const userDetails = useSelector((state) => state?.user?.user);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const today = new Date().toISOString().split("T")[0];

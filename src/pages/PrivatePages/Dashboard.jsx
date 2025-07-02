@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { CalorieChart } from "../../components/PrivateLayout/Dashboard/CalorieChart";
 export const Dashboard = () => {
   const [open, setOpen] = useState(false);
-  const user = useSelector((state) => state?.user);
+  const user = useSelector((state) => state?.user?.user);
   console.log("user===", user);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const REQUIRED_KEYS = [

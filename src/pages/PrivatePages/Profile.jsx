@@ -12,7 +12,7 @@ const goals = ["lose", "maintain", "gain", "custom"];
 
 export const Profile = () => {
   const dispatch = useDispatch();
-  const userDetails = useSelector((s) => s.user) || {};
+  const userDetails = useSelector((s) => s.user.user) || {};
   const [user, setUser] = useState(userDetails);
   const [editMode, setEdit] = useState(false);
   const { handleLogout } = useLogout();
