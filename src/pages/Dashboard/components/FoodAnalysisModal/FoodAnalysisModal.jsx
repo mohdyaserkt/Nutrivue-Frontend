@@ -72,7 +72,7 @@ const [activeMeal, setActiveMeal] = useState( 'breakfast');
         </div>
       ))}
     </div>
-        <div className="modal-body">
+        <div className="modal-body" style={{ overflow: 'scroll', maxHeight: '58vh' }}>
           {/* <div className="nutrition-summary">
             <div className="summary-card">
               <div className="summary-icon">
