@@ -1,10 +1,10 @@
 import { Outlet } from "react-router-dom";
-import { Navbar } from "../components/PrivateLayout/Navbar";
+import { Header } from "../components/PublicLayout/Header";
 
 export const PrivateLayout = () => {
   return (
     <>
-      <Navbar />
+      <Header />
       <Outlet />
     </>
   );
