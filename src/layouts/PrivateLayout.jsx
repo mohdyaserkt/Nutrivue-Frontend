@@ -1,10 +1,10 @@
 import { Outlet } from "react-router-dom";
-import { Header } from "../components/PublicLayout/Header";
+import {HeaderPrivate } from "../components/PrivateLayout/Header/Header";
 
 export const PrivateLayout = () => {
   return (
     <>
-      <Header />
+      <HeaderPrivate />
       <Outlet />
     </>
   );

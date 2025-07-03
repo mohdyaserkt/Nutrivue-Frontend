@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Header from "./components/Header/Header";
 import DailySummary from "./components/DailySummary/DailySummary";
 import ScanSection from "./components/ScanSection/ScanSection";
 import DailyLog from "./components/DailyLog/DailyLog";
