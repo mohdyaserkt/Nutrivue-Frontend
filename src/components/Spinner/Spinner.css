@@ -1,0 +1,46 @@
+/* Spinner.css */
+
+/* 1. Full-screen flex container */
+.spinner {
+  position: fixed;       /* stay put even if page scrolls */
+  top: 0;
+  left: 0;
+  width: 100vw;          /* full viewport width */
+  height: 100vh;         /* full viewport height */
+  display: flex;         /* enable centering */
+  align-items: center;   /* vertical centering */
+  justify-content: center; /* horizontal centering */
+  background: rgba(255,255,255,0.6); /* optional: translucent backdrop */
+  z-index: 9999;         /* sit on top of everything */
+}
+
+/* 2. The spinning circle (same as before) */
+.spinner__circle {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #333;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* 3. Size modifiers */
+.spinner--small .spinner__circle {
+  width: 24px;
+  height: 24px;
+}
+
+.spinner--medium .spinner__circle {
+  width: 48px;
+  height: 48px;
+}
+
+.spinner--large .spinner__circle {
+  width: 72px;
+  height: 72px;
+}
+
+/* 4. Keyframes */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

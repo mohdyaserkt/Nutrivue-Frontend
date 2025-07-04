@@ -1,36 +1,49 @@
 import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useDispatch } from "react-redux";
-import { addUser, clearUser, setAuthLoading } from "../redux/slice/userSlice";
 import { axiosInstance } from "./axiosInstance";
+import { addUser, clearUser } from "../redux/slice/userSlice";
 
-export const AuthWatcher = () => {
+export const useAuthWatcher = (setProfileModalOpen) => {
   const dispatch = useDispatch();
-
+  console.log(
+    "userDetails====",
+    useSelector((state) => state?.user?.user)
+  );
   useEffect(() => {
     const auth = getAuth();
-    dispatch(setAuthLoading(true));
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        try {
-          const idToken = await firebaseUser.getIdToken();
-          const response = await axiosInstance.get("/users/me", {
-            headers: { Authorization: `Bearer ${idToken}` },
-          });
+      if (!firebaseUser) {
+        // signed out
+        dispatch(clearUser());
+        setProfileModalOpen(false);
+        return;
+      }
 
-          dispatch(addUser(response.data));
-        } catch (error) {
+      try {
+        console.log("in auth watch component===");
+        const { data } = await axiosInstance.get("/users/me");
+        dispatch(addUser(data));
+        setProfileModalOpen(false);
+      } catch (error) {
+        console.error("Failed to fetch user details:", error);
+        const status = error?.response?.status;
+        const detail = error?.response?.data?.detail;
+
+        if (
+          status === 404 &&
+          detail === "Profile not found. Please create your profile first."
+        ) {
+          setProfileModalOpen(true);
+        } else {
           console.error("Failed to fetch user details:", error);
+          // Other errors: treat as “need profile”
           dispatch(clearUser());
         }
-      } else {
-        dispatch(clearUser());
       }
     });
 
     return () => unsubscribe();
   }, [dispatch]);
-
-  return null;
 };

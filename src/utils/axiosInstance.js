@@ -3,7 +3,7 @@ import { getAuth } from "firebase/auth";
 
 export const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
-  withCredentials: true,
+  // withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
@@ -17,7 +17,8 @@ axiosInstance.interceptors.request.use(
 
     if (user) {
       const token = await user.getIdToken();
-      config.headers.Authorization = `Bearer ${token}`;
+      console.log("axios instance token===", token);
+      config.headers["Authorization"] = `Bearer ${token}`;
     }
 
     return config;
@@ -44,7 +45,8 @@ axiosInstance.interceptors.response.use(
 
         if (user) {
           const newAccessToken = await user.getIdToken(true);
-          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+
+          originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
           return axiosInstance(originalRequest);
         } else {
           console.error("User not authenticated");

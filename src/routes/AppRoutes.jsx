@@ -5,41 +5,36 @@ import { Home } from "../pages/LandingPage/Home";
 import { MainLayout } from "../layouts/MainLayout";
 import { PrivateRoutes } from "./PrivateRoutes";
 import { PrivateLayout } from "../layouts/PrivateLayout";
-import { Dashboard } from "../pages/PrivatePages/Dashboard";
 import { Profile } from "../pages/PrivatePages/Profile";
 import { NotFound } from "../pages/NotFound";
 import { VerifyPage } from "../pages/Auth/VerifyPage";
-import { Logs } from "../pages/PrivatePages/Logs";
+// import { Logs } from "../pages/PrivatePages/Logs";
 import NewDashboard from "../pages/Dashboard/Dashboard";
-import { AuthWatcher } from "../utils/AuthWatcher";
+import { AuthPage } from "../pages/Auth/AuthPage";
 
 function AppRoutes() {
   return (
-    <>
-      <AuthWatcher />
-      <Routes>
-        <Route element={<MainLayout />}>
-          {/* Public Routes with shared MainLayout */}
-          <Route path="/" element={<Home />} />
+    <Routes>
+      <Route element={<MainLayout />}>
+        {/* Public Routes with shared MainLayout */}
+        <Route path="/" element={<Home />} />
 
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Signup />} />
-          <Route path="/verify" element={<VerifyPage />} />
-        </Route>
+        <Route path="/login" element={<AuthPage />} />
+        <Route path="/register" element={<AuthPage />} />
+        <Route path="/verify" element={<VerifyPage />} />
+      </Route>
 
-        {/* Protected Routes with DashboardLayout */}
-        <Route element={<PrivateRoutes />}>
-          <Route element={<PrivateLayout />}>
-            <Route path="/dashboard" element={<NewDashboard />} />
-            <Route path="/chk" element={<Dashboard />} />
-            <Route path="/logs" element={<Logs />} />
-            <Route path="/profile" element={<Profile />} />
-          </Route>
+      {/* Protected Routes with DashboardLayout */}
+      <Route element={<PrivateRoutes />}>
+        <Route element={<PrivateLayout />}>
+          <Route path="/dashboard" element={<NewDashboard />} />
+          {/* <Route path="/logs" element={<Logs />} /> */}
+          <Route path="/profile" element={<Profile />} />
         </Route>
-        {/* 404 Fallback */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </>
+      </Route>
+      {/* 404 Fallback */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
 

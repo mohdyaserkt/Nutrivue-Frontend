@@ -1,7 +1,7 @@
 // src/components/Header.jsx
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useLogout } from "../../../hooks/useLogout";
+import { useLogout } from "../../../../hooks/useLogout";
 import "./Header.css";
 export const HeaderPrivate = () => {
   const [menuOpen, setMenuOpen] = useState(false);

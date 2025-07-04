@@ -15,12 +15,16 @@ export const useGoogleAuth = () => {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result?.user;
+      const userData = {
+        uid: user.uid,
+        email: user.email,
+        name: user.displayName || "",
+      };
       if (!user) {
         toast.error("User authentication failed. Please try again.");
         return;
       }
       const isNewUser = result?._tokenResponse?.isNewUser ?? false;
-      const refreshToken = user.refreshToken;
       const idToken = await user.getIdToken();
       console.log("result==", result);
       console.log("token==", idToken);
@@ -31,54 +35,26 @@ export const useGoogleAuth = () => {
         return;
       }
       //  Store the access token and refresh
-      localStorage.setItem("accessToken", idToken);
-      localStorage.setItem("refreshToken", refreshToken);
 
       if (isNewUser) {
-        try {
-          dispatch(
-            addUser({
-              uid: user.uid,
-              email: user.email,
-              name: user.displayName,
-            })
-          );
-        } catch (error) {
-          console.log(error);
-          toast.error(error.message);
-          return;
-        }
+        dispatch(addUser(userData));
       } else {
         try {
           const { data } = await axiosInstance.get("/users/me");
           console.log(data, "==response.data");
-
-          if (data) {
-            dispatch(addUser(data));
-          }
+          dispatch(addUser(data));
         } catch (error) {
-          if (error.response.status === 404) {
-            dispatch(
-              addUser({
-                uid: user.uid,
-                email: user.email,
-                name: user.displayName,
-              })
-            );
-          } else {
-            console.error("Fetch user failed:", error);
-            console.error("status", error.response.status);
-            toast.error("Failed to fetch user data.");
-            return;
-          }
+          console.warn("No DB record, falling back to Firebase data.", error);
+          dispatch(addUser(userData));
         }
       }
-
-      navigate("/dashboard");
 
       toast.success(
         isNewUser ? "Google signup successful!" : "Google login successful!"
       );
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000);
     } catch (error) {
       console.error("Google auth failed:", error);
 

@@ -1,30 +1,32 @@
-import '../../dashboard.css';
-import '../../animation.css';
-import { useState, useEffect } from 'react';
+import "../../dashboard.css";
+import "../../animation.css";
+import { useState, useEffect } from "react";
 
 function FoodAnalysisModal({ foodData, onClose, onAddToLog }) {
-  const total_calories = foodData?.items?.reduce((accu, curr) => accu + curr.calories_per_gram, 0);
+  const total_calories = foodData?.items?.reduce(
+    (accu, curr) => accu + curr.calories_per_gram,
+    0
+  );
 
   const [consumedGrams, setConsumedGrams] = useState({});
-const [activeMeal, setActiveMeal] = useState( 'breakfast');
+  const [activeMeal, setActiveMeal] = useState("breakfast");
 
   const mealOptions = [
-    { type: 'breakfast', icon: 'fas fa-sun', label: 'Breakfast' },
-    { type: 'lunch', icon: 'fas fa-utensils', label: 'Lunch' },
-    { type: 'dinner', icon: 'fas fa-moon', label: 'Dinner' },
-    { type: 'snack', icon: 'fas fa-cookie', label: 'Snack' },
+    { type: "breakfast", icon: "fas fa-sun", label: "Breakfast" },
+    { type: "lunch", icon: "fas fa-utensils", label: "Lunch" },
+    { type: "dinner", icon: "fas fa-moon", label: "Dinner" },
+    { type: "snack", icon: "fas fa-cookie", label: "Snack" },
   ];
 
   const handleSelect = (meal) => {
     setActiveMeal(meal);
-    
   };
 
   // ✅ Initialize consumedGrams with default 100g values on first render
   useEffect(() => {
     if (foodData?.items) {
       const defaultGrams = {};
-      foodData.items.forEach(item => {
+      foodData.items.forEach((item) => {
         defaultGrams[item.name] = 100;
       });
       setConsumedGrams(defaultGrams);
@@ -41,14 +43,14 @@ const [activeMeal, setActiveMeal] = useState( 'breakfast');
       return;
     }
 
-    setConsumedGrams(prev => ({
+    setConsumedGrams((prev) => ({
       ...prev,
-      [name]: num
+      [name]: num,
     }));
   };
 
   return (
-    <div id='food-analysis-modal' className="modal active">
+    <div id="food-analysis-modal" className="modal active">
       <div className="modal-content glass-card">
         <div className="modal-header">
           <div className="header-content">
@@ -57,22 +59,29 @@ const [activeMeal, setActiveMeal] = useState( 'breakfast');
             </div>
             <h3>Meal Analysis</h3>
           </div>
-          <button className="close-modal" onClick={onClose}>&times;</button>
+          <button className="close-modal" onClick={onClose}>
+            &times;
+          </button>
         </div>
         <div className="meal-type-selector">
-      {mealOptions.map((option) => (
-        <div
-          key={option.type}
-          className={`meal-option ${activeMeal === option.type ? 'active' : ''}`}
-          data-meal={option.type}
-          onClick={() => handleSelect(option.type)}
-        >
-          <i className={option.icon}></i>
-          <span>{option.label}</span>
+          {mealOptions.map((option) => (
+            <div
+              key={option.type}
+              className={`meal-option ${
+                activeMeal === option.type ? "active" : ""
+              }`}
+              data-meal={option.type}
+              onClick={() => handleSelect(option.type)}
+            >
+              <i className={option.icon}></i>
+              <span>{option.label}</span>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
-        <div className="modal-body" style={{ overflow: 'scroll', maxHeight: '55vh' }}>
+        <div
+          className="modal-body"
+          style={{ overflow: "scroll", maxHeight: "55vh" }}
+        >
           {/* <div className="nutrition-summary">
             <div className="summary-card">
               <div className="summary-icon">
@@ -105,7 +114,9 @@ const [activeMeal, setActiveMeal] = useState( 'breakfast');
                         <i className="fas fa-dumbbell"></i>
                       </div>
                       <div className="pill-content">
-                        <span className="pill-value">{item.nutrients.protein_g}g</span>
+                        <span className="pill-value">
+                          {item.nutrients.protein_g}g
+                        </span>
                         <span className="pill-label">Protein</span>
                       </div>
                     </div>
@@ -115,7 +126,9 @@ const [activeMeal, setActiveMeal] = useState( 'breakfast');
                         <i className="fas fa-wheat-awn"></i>
                       </div>
                       <div className="pill-content">
-                        <span className="pill-value">{item.nutrients.carbohydrates_g}g</span>
+                        <span className="pill-value">
+                          {item.nutrients.carbohydrates_g}g
+                        </span>
                         <span className="pill-label">Carbs</span>
                       </div>
                     </div>
@@ -125,7 +138,9 @@ const [activeMeal, setActiveMeal] = useState( 'breakfast');
                         <i className="fas fa-oil-can"></i>
                       </div>
                       <div className="pill-content">
-                        <span className="pill-value">{item.nutrients.fats_g}g</span>
+                        <span className="pill-value">
+                          {item.nutrients.fats_g}g
+                        </span>
                         <span className="pill-label">Fats</span>
                       </div>
                     </div>
@@ -163,7 +178,7 @@ const [activeMeal, setActiveMeal] = useState( 'breakfast');
           <button
             id="add-to-log"
             className="cta-button pulse"
-            onClick={() => onAddToLog(consumedGrams,activeMeal)} // Pass state to parent
+            onClick={() => onAddToLog(consumedGrams, activeMeal)} // Pass state to parent
           >
             <i className="fas fa-plus-circle"></i> Add to Daily Log
           </button>
