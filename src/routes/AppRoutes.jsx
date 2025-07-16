@@ -1,6 +1,4 @@
 import { Routes, Route } from "react-router-dom";
-import { Login } from "../pages/Auth/Login";
-import { Signup } from "../pages/Auth/Signup";
 import { Home } from "../pages/LandingPage/Home";
 import { MainLayout } from "../layouts/MainLayout";
 import { PrivateRoutes } from "./PrivateRoutes";
