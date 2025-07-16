@@ -5,8 +5,8 @@ import '../../animation.css'
 import { axiosInstance } from '../../../../utils/axiosInstance'
 
 
-function DailyLog({logNotifier, OpenDailyLogModal,setslectedDate}) {
-  const userDetails = useSelector((state) => state?.user)
+function DailyLog({logNotifier, OpenDailyLogModal,setSelectedDate}) {
+  const userDetails = useSelector((state) => state?.user?.user)
   const targetCalorie = userDetails?.target_calories || 0.0
   const [currentDate, setCurrentDate] = useState(new Date())
   const [filteredLogs, setFilteredLogs] = useState({})
@@ -62,7 +62,7 @@ function DailyLog({logNotifier, OpenDailyLogModal,setslectedDate}) {
           key={`day-${i}`}
           className={`day ${isActive ? 'active' : ''}`}
           onClick={() =>{
-            setslectedDate(`${selectedYear}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`)
+            setSelectedDate(`${selectedYear}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`)
             OpenDailyLogModal()
             }
           }

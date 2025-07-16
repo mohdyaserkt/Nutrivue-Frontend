@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import { axiosInstance } from "../../../../utils/axiosInstance";
 import { useSelector } from "react-redux";
 const DailyLogModal = ({ isVisible, onClose, selectedDate }) => {
-  const userDetails = useSelector((state) => state?.user);
+  const userDetails = useSelector((state) => state?.user?.user);
   const targetCalorie = userDetails?.target_calories || 0.0;
   const [data, setdata] = useState(null);
   function getCaloriePercentage(consumedCalories, targetCalories) {

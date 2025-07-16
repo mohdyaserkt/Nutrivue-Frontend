@@ -10,10 +10,9 @@ export const useLogout = () => {
   const dispatch = useDispatch();
   const handleLogout = async () => {
     try {
-      await signOut(auth); // Firebase logout
+      await signOut(auth);
       toast("Logout Successfully");
       navigate("/login");
-      localStorage.removeItem("accessToken");
       dispatch(clearUser());
     } catch (error) {
       console.error("Logout error:", error);

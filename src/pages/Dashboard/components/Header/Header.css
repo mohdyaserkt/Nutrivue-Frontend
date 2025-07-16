@@ -1,0 +1,100 @@
+/* Header.css */
+
+/* Glass-morphic nav */
+.glass-nav {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 15px;
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+  padding: 15px 0;
+}
+
+/* Container centering */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Flex layout for nav */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Logo styling */
+.logo {
+  cursor: pointer;
+}
+.logo img {
+  height: 40px;
+  width: auto;
+  display: block;
+}
+
+/* User-menu positioning */
+.user-menu {
+  position: relative;
+}
+
+/* Avatar styling */
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--primary);
+  cursor: pointer;
+}
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Dropdown menu, hidden by default */
+.dropdown-menu {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 1001;
+}
+
+/* Show dropdown when open */
+.dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Dropdown items */
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  font: inherit;
+  color: var(--dark);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.dropdown-item:hover {
+  background: rgba(0,0,0,0.05);
+}

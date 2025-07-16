@@ -8,7 +8,7 @@ import { axiosInstance } from "../../../../utils/axiosInstance";
 
 function DailySummary({calorieData}) {
   
-  const userDetails = useSelector((state) => state?.user);
+  const userDetails = useSelector((state) => state?.user?.user);
   const targetCalorie = userDetails?.target_calories || 0.0;
   
 

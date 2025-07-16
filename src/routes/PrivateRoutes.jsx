@@ -1,9 +1,29 @@
-import { Navigate, Outlet } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-export const PrivateRoutes = () => {
-    const user = useSelector((state) => state?.user);
-    // If no user info or email, redirect to login
-  const isAuthenticated = !!user && !!user.email;
+import { useState, useEffect } from "react";
+import { Navigate, Outlet } from "react-router-dom";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { Spinner } from "../components/Spinner/Spinner";
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
-}
+export const PrivateRoutes = () => {
+  // local state for “are we still waiting on Firebase?”
+  const [initializing, setInitializing] = useState(true);
+  // local state for “are we signed in?”
+  const [signedIn, setSignedIn] = useState(false);
+
+  useEffect(() => {
+    const auth = getAuth();
+    // subscribe to auth changes
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setSignedIn(!!user);
+      setInitializing(false);
+    });
+    // cleanup
+    return unsubscribe;
+  }, []);
+
+  if (initializing) {
+    return <Spinner size="large" />;
+  }
+
+  // If signed in, render child routes; otherwise redirect to /login
+  return signedIn ? <Outlet /> : <Navigate to="/login" replace />;
+};

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Header from "./components/Header/Header";
 import DailySummary from "./components/DailySummary/DailySummary";
 import ScanSection from "./components/ScanSection/ScanSection";
 import DailyLog from "./components/DailyLog/DailyLog";
@@ -11,8 +10,7 @@ import "./animation.css";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../utils/axiosInstance";
 import DailyLogModal from "./components/DailyLog/DailyLogModal";
-import CompleteProfileModal from "./components/CompleteProfleModal/CompleteProfileModal";
-import { useSelector } from "react-redux";
+
 
 function NewDashboard() {
   const [showFoodModal, setShowFoodModal] = useState(false);
@@ -25,11 +23,9 @@ function NewDashboard() {
   const [uploading, setUploading] = useState(false);
   const [Items, setItems] = useState([]);
   const today = new Date().toISOString().split("T")[0];
-  const [slectedDate, setslectedDate] = useState("");
-  const [showCompleteProfileModal, setShowCompleteProfileModal] =
-    useState(false);
+  const [slectedDate, setSelectedDate] = useState("");
 
-  const user = useSelector((state) => state?.user);
+
   useEffect(() => {
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
@@ -66,24 +62,7 @@ function NewDashboard() {
     };
   }, []);
 
-  const REQUIRED_KEYS = [
-    "name",
-    "age",
-    "gender",
-    "weight_kg",
-    "height_cm",
-    "activity_level",
-    "goal",
-    "target_calories",
-    "email",
-  ];
-  const isModalOpen = !REQUIRED_KEYS.every((key) => {
-    const value = user?.[key];
-    return value !== null && value !== undefined && value !== "";
-  });
-  useEffect(() => {
-    setShowCompleteProfileModal(isModalOpen);
-  }, [showCompleteProfileModal]);
+
 
   const fetchTodaysSummary = async () => {
     try {
@@ -209,7 +188,7 @@ function NewDashboard() {
           />
           <DailyLog
             OpenDailyLogModal={() => setDailyLogModal(true)}
-            setslectedDate={setslectedDate}
+            setSelectedDate={setSelectedDate}
             logNotifier={loggedItems}
           />
         </div>
@@ -250,12 +229,7 @@ function NewDashboard() {
         />
       )}
 
-      {showCompleteProfileModal && (
-        <CompleteProfileModal
-          isOpen={showCompleteProfileModal}
-          onClose={() => setShowCompleteProfileModal(false)}
-        />
-      )}
+     
     </div>
   );
 }
