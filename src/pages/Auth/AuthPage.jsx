@@ -14,7 +14,6 @@ import { SubmitButton } from "../../components/PublicLayout/SubmitButton";
 import "./auth.css";
 import { axiosInstance } from "../../utils/axiosInstance";
 import { GoogleButton } from "../../components/PrivateLayout/GoogleButton";
-import axios from "axios";
 
 export const AuthPage = () => {
   const navigate = useNavigate();
@@ -57,7 +56,7 @@ export const AuthPage = () => {
     );
     setTimeout(() => {
       navigate("/dashboard");
-    }, 2000);
+    }, 300);
   };
 
   const handleEmailPassword = async (e) => {
