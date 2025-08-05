@@ -103,7 +103,7 @@ export const AuthPage = () => {
       <div className="glass-card auth-card">
         {/* Logo */}
         <div className="auth-logo">
-          <img src="https://…/logo.svg" alt="Your App" />
+          <img src="https://res.cloudinary.com/daz1e04fq/image/upload/v1749749899/Nutrivue/kzrizpn0q65was9yxz4o.svg" alt="Your App" />
         </div>
 
         {/* Tabs */}
@@ -130,29 +130,44 @@ export const AuthPage = () => {
           <form className="auth-form" onSubmit={handleEmailPassword}>
             <div className="form-group">
               <label>Email Address</label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+
+              <label className="input-with-icon">
+                <i className="fas fa-envelope"></i>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  required
+                />
+              </label>
             </div>
+
 
             <div className="form-group">
               <label>{mode === "login" ? "Password" : "Create Password"}</label>
-              <div className="input-with-icon">
+
+              <label className="input-with-icon" style={{ display: 'flex', alignItems: 'center' }}>
                 <input
                   type={showPassword ? "text" : "password"}
                   required
                   value={password}
+                  placeholder={"Enter your password"}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                <i
-                  className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}
-                  onClick={toggleShowPassword}
-                />
-              </div>
+
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation(); // ✅ Prevent the label from hijacking this click
+                    toggleShowPassword();
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  <i className={`fas ${showPassword ? "fa-eye" : "fa-eye-slash"}`} style={{ width: 'fit-content' }} />
+                </span>
+              </label>
             </div>
+
 
             <SubmitButton
               type="submit"
@@ -163,22 +178,26 @@ export const AuthPage = () => {
           <form className="auth-form" onSubmit={handleMagicLink}>
             <div className="form-group">
               <label>Email Address</label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+
+              <label className="input-with-icon">
+                <i className="fas fa-envelope"></i>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  required
+                />
+              </label>
             </div>
             <SubmitButton type="submit" text="Send Magic Link" />
           </form>
         )}
+        <div class="magic-link">
 
-        <div className="magic-link-toggle">
           {mode === "login" && (
-            <button onClick={() => setShowMagicLink((p) => !p)}>
-              {showMagicLink ? "Use Password Instead" : "Use Magic Link"}
-            </button>
+            <p >{showMagicLink ? "Prefer Password ?" : "Prefer a magic link?"} <a style={{ cursor: "pointer" }} onClick={() => setShowMagicLink((p) => !p)} id="show-magic-link">{showMagicLink ? "Use Password Instead" : "Email me a login link"}</a></p>
+
           )}
         </div>
 
