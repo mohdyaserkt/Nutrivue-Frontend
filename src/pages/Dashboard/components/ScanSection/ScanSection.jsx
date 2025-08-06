@@ -54,7 +54,7 @@ function ScanSection({ onOpenCamera, onFileUpload, items,uploadStatus }) {
         {/* Desktop - Upload Button */}
         <label htmlFor="file-input" className="scan-option desktop-only">
           <i className="fas fa-cloud-upload-alt"></i>
-          <span>{uploadStatus?"Image Analyzing...":"Upload Image"}</span>
+         <span>{uploadStatus ? "Analyzing image..." : "Upload Image"}</span>
         </label>
 
         <input

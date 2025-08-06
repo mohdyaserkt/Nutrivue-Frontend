@@ -11,7 +11,6 @@ import toast from "react-hot-toast";
 import { axiosInstance } from "../../utils/axiosInstance";
 import DailyLogModal from "./components/DailyLog/DailyLogModal";
 
-
 function NewDashboard() {
   const [showFoodModal, setShowFoodModal] = useState(false);
   const [showLogModal, setShowLogModal] = useState(false);
@@ -24,7 +23,6 @@ function NewDashboard() {
   const [Items, setItems] = useState([]);
   const today = new Date().toISOString().split("T")[0];
   const [slectedDate, setSelectedDate] = useState("");
-
 
   useEffect(() => {
     // Smooth scrolling for anchor links
@@ -62,8 +60,6 @@ function NewDashboard() {
     };
   }, []);
 
-
-
   const fetchTodaysSummary = async () => {
     try {
       const { data } = await axiosInstance.get(`/food/log/daily/${today}`);
@@ -79,11 +75,18 @@ function NewDashboard() {
   }, [loggedItems]);
 
   const handleFileUpload = async (e) => {
+    if (uploading) return;
     if (e.target.files.length > 0) {
       // Process image would go here
+      const file = e.target.files[0];
+      if (!file.type.startsWith("image/")) {
+        toast.error("Please upload a valid image file.");
+        e.target.value = ""; 
+        return;
+      }
       const formData = new FormData();
-      formData.append("file", e.target.files[0]);
-      console.log("formData==", formData);
+      formData.append("file", file);
+
       try {
         setUploading(true);
         const response = await axiosInstance.post(
@@ -97,6 +100,7 @@ function NewDashboard() {
         );
         if (!response.data?.items || response.data?.items.length === 0) {
           toast.error("No food items detected. Try another image.");
+          setUploading(false);
           return;
         }
         setFoodData(response.data);
@@ -107,6 +111,7 @@ function NewDashboard() {
         toast.error("Image upload failed. Please try again.");
       } finally {
         setUploading(false);
+        e.target.value = "";
       }
     }
   };
@@ -228,8 +233,6 @@ function NewDashboard() {
           }}
         />
       )}
-
-     
     </div>
   );
 }
