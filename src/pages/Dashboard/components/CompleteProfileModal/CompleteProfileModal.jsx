@@ -44,7 +44,7 @@ const CompleteProfileModal = ({ isOpen, onClose }) => {
         "/users/save-user",
         profileData
       );
-      console.log("response==", data);
+      
       toast.success("updated successful");
 
       dispatch(updateUser(data));

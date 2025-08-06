@@ -25,7 +25,7 @@ const DailyLogModal = ({ isVisible, onClose, selectedDate }) => {
         `/food/log/daily/${selectedDate}`
       );
       setdata(data);
-      console.log(data);
+      
     } catch (error) {
       toast.error(error.message ?? "Failed to fetch calorie data.");
     }

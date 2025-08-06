@@ -45,7 +45,7 @@ export const VerifyPage = () => {
                 "Content-Type": "application/json",
               },
             });
-            console.log(response.data, "==response.data");
+            
 
             dispatch(addUser(response?.data));
           } else {

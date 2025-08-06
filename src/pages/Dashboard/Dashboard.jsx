@@ -117,7 +117,7 @@ function NewDashboard() {
   };
 
   const handleAddToLog = async (consumedGrams, meal_type) => {
-    console.log(consumedGrams, meal_type);
+    
     const items = foodData.items.map((item, index) => ({
       ...item, // preserve all existing properties as-is
       weight_grams: Number(consumedGrams[item.name] || 0),

@@ -19,7 +19,7 @@ function LogSummaryModal({ onClose, foodItems }) {
     }
   );
 
-  console.log(summary);
+  
 
   // Array of Font Awesome icon class names
  const foodIcons = [

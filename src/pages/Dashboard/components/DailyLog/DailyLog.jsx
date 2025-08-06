@@ -24,7 +24,7 @@ function DailyLog({logNotifier, OpenDailyLogModal,setSelectedDate}) {
         `/food/log/monthly/${selectedYear}/${selectedMonth}`
       )
       setFilteredLogs(data?.daily_summaries || {})
-      console.log('Fetched all logs:', data)
+      
     } catch (error) {
       console.error('Error fetching filtered logs:', error)
     }

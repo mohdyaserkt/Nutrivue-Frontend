@@ -1,15 +1,12 @@
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { axiosInstance } from "./axiosInstance";
 import { addUser, clearUser } from "../redux/slice/userSlice";
 
 export const useAuthWatcher = (setProfileModalOpen) => {
   const dispatch = useDispatch();
-  console.log(
-    "userDetails====",
-    useSelector((state) => state?.user?.user)
-  );
+  
   useEffect(() => {
     const auth = getAuth();
 
@@ -22,7 +19,7 @@ export const useAuthWatcher = (setProfileModalOpen) => {
       }
 
       try {
-        console.log("in auth watch component===");
+        
         const { data } = await axiosInstance.get("/users/me");
         dispatch(addUser(data));
         setProfileModalOpen(false);

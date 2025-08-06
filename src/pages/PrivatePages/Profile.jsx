@@ -16,9 +16,9 @@ export const Profile = () => {
   const [user, setUser] = useState(userDetails);
   const [editMode, setEdit] = useState(false);
   const { handleLogout } = useLogout();
-  console.log("user===", user);
+ 
   const handleChange = (field, value) => {
-    console.log("value===", value);
+    
     setUser((u) => ({ ...u, [field]: value }));
   };
   const onLogoutClick = async () => {
