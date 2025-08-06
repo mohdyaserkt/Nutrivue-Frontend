@@ -26,10 +26,7 @@ export const useGoogleAuth = () => {
       }
       const isNewUser = result?._tokenResponse?.isNewUser ?? false;
       const idToken = await user.getIdToken();
-      console.log("result==", result);
-      console.log("token==", idToken);
-      console.log("user==", user);
-      console.log("isNewUser==", isNewUser);
+
       if (!idToken) {
         toast.error("Unable to retrieve access token.");
         return;
@@ -41,7 +38,7 @@ export const useGoogleAuth = () => {
       } else {
         try {
           const { data } = await axiosInstance.get("/users/me");
-          console.log(data, "==response.data");
+         
           dispatch(addUser(data));
         } catch (error) {
           console.warn("No DB record, falling back to Firebase data.", error);
@@ -52,9 +49,8 @@ export const useGoogleAuth = () => {
       toast.success(
         isNewUser ? "Google signup successful!" : "Google login successful!"
       );
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 2000);
+
+      navigate("/dashboard");
     } catch (error) {
       console.error("Google auth failed:", error);
 
